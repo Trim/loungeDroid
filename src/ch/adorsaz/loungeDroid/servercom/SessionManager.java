@@ -44,9 +44,6 @@ public class SessionManager {
         return mSessionManager;
     }
 
-    public Boolean loginLounge() throws LoginLoungeException {
-        Boolean result = false;
-        HttpURLConnection urlConnection = null;
     public void loginLounge() throws AuthenticationFailLoungeException {
         try {
             String urlParameters = LOGIN_GET_RSSLOUNGE + "="
@@ -75,17 +72,19 @@ public class SessionManager {
     }
 
     private void getPreferences(Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        if (context != null) {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(context);
 
-        mServerUrl = prefs.getString("urlPref", "");
-        if (!mServerUrl.startsWith("http://")
-                && !mServerUrl.startsWith("https://")) {
-            mServerUrl = "http://" + mServerUrl;
+            mServerUrl = prefs.getString("urlPref", "");
+            if (!mServerUrl.startsWith("http://")
+                    && !mServerUrl.startsWith("https://")) {
+                mServerUrl = "http://" + mServerUrl;
+            }
+
+            mLogin = Uri.encode(prefs.getString("loginPref", ""));
+            mPassword = Uri.encode(prefs.getString("passwordPref", ""));
         }
-
-        mLogin = Uri.encode(prefs.getString("loginPref", ""));
-        mPassword = Uri.encode(prefs.getString("passwordPref", ""));
     }
 
     private String streamToString(InputStream inputStream) throws IOException {
