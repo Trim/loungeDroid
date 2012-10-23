@@ -105,10 +105,21 @@ public class SessionManager {
         mPassword = Uri.encode(prefs.getString("passwordPref", ""));
     }
 
-    static String streamToString(InputStream inputStream) {
-        BufferedReader inputReader = new BufferedReader(new InputStreamReader(
+    private String streamToString(InputStream inputStream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(
                 inputStream));
-        String line = null;
+
+        String result = br.readLine();
+        String line = result;
+
+        while (line != null) {
+            result = result + "\n" + line;
+            line = br.readLine();
+        }
+
+        return result;
+    }
+
     protected JSONObject applyHttpRequest(String pageUrl, String httpParameters) {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
