@@ -1,4 +1,4 @@
-package ch.adorsaz.loungeDroid.Article;
+package ch.adorsaz.loungeDroid.article;
 
 public class Article {
     private Integer mId;
