@@ -109,16 +109,59 @@ public class SessionManager {
         BufferedReader inputReader = new BufferedReader(new InputStreamReader(
                 inputStream));
         String line = null;
+    protected JSONObject applyHttpRequest(String pageUrl, String httpParameters) {
+        JSONObject jsonResponse = null;
+        HttpURLConnection urlConnection = null;
 
         try {
-            line = inputReader.readLine();
-            while (line != null) {
-                line += "\n" + inputReader.readLine();
+            urlConnection = (HttpURLConnection) new URL(mServerUrl + pageUrl)
+                    .openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setChunkedStreamingMode(0);
+            
+            if(mSessionCookie!=null){
+                urlConnection.setRequestProperty("Cookie", mSessionCookie);
             }
-        } catch (IOException e) {
+                        
+            DataOutputStream out = new DataOutputStream(
+                    urlConnection.getOutputStream());
+            out.writeBytes(httpParameters);
+            out.flush();
+            out.close();
+
+            if (urlConnection.getResponseCode() == 200) {
+                if(urlConnection.getHeaderField("Set-Cookie")!=null){
+                    mSessionCookie=urlConnection.getHeaderField("Set-Cookie");
+                }
+                
+                InputStream responseInput = urlConnection.getInputStream();
+                jsonResponse = new JSONObject(streamToString(responseInput));
+                responseInput.close();
+            } else {
+                throw new ConnectException();
+            }
+
+        } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (IOException e) {
+            try {
+                InputStream es = urlConnection.getErrorStream();
+                int ret = 0;
+                // read the response body
+                while ((ret = es.read()) > 0) {
+                }
+                es.close();
+            } catch (IOException ex) {
+                // deal with the exception
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            urlConnection.disconnect();
         }
-        return line;
+
+        return jsonResponse;
     }
 }
