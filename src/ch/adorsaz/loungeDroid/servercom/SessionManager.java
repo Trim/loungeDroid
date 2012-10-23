@@ -47,6 +47,23 @@ public class SessionManager {
         return mSessionManager;
     }
 
+    public final static SessionManager getInstance(String url, String login,
+            String password) {
+        if (mSessionManager == null) {
+            mSessionManager = new SessionManager();
+        }
+
+        mSessionManager.setPreferences(url, login, password);
+
+        return mSessionManager;
+    }
+
+    private void setPreferences(String url, String login, String password) {
+        mLogin = login;
+        mPassword = password;
+        mServerUrl = url;
+    }
+
     public void loginLounge() throws AuthenticationFailLoungeException {
         try {
             String urlParameters = LOGIN_GET_RSSLOUNGE + "="
