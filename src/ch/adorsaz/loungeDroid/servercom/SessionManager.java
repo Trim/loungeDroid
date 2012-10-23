@@ -42,7 +42,7 @@ public class SessionManager {
             mSessionManager = new SessionManager();
         }
 
-        mSessionManager.getPreferences(context);
+        // mSessionManager.getPreferences(context);
 
         return mSessionManager;
     }
