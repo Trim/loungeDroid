@@ -18,17 +18,21 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class SessionManager {
-    private String mLogin;
-    private String mPassword;
-    private String mServerUrl;
+    private String mLogin = null;
+    private String mPassword = null;
+    private String mServerUrl = null;
+    private String mSessionCookie = null;
     private static SessionManager mSessionManager = null;
 
     private final static String LOGIN_PAGE_RSSLOUNGE = "/index/login";
     private final static String LOGIN_GET_RSSLOUNGE = "username";
     private final static String PASSWORD_GET_RSSLOUNGE = "password";
-    private final static String JSON_GET_RSSLOUNGE = "json=true";
+    protected final static String JSON_GET_RSSLOUNGE = "json=true";
+
+    private final static String LOG_DEBUG_LOUNGE = "loungeDroid.server :";
 
     public final static SessionManager getInstance(Context context) {
         if (mSessionManager == null) {
