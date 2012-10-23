@@ -47,45 +47,28 @@ public class SessionManager {
     public Boolean loginLounge() throws LoginLoungeException {
         Boolean result = false;
         HttpURLConnection urlConnection = null;
+    public void loginLounge() throws AuthenticationFailLoungeException {
         try {
-            String urlParameters = LOGIN_GET_RSSLOUNGE
+            String urlParameters = LOGIN_GET_RSSLOUNGE + "="
                     + URLEncoder.encode(mLogin, "UTF-8") + "&"
-                    + PASSWORD_GET_RSSLOUNGE
-                    + URLEncoder.encode(mPassword, "UTF-8") + "&"
+                    + PASSWORD_GET_RSSLOUNGE + "=" + mPassword + "&"
                     + JSON_GET_RSSLOUNGE;
 
-            urlConnection = (HttpURLConnection) new URL(mServerUrl
-                    + LOGIN_PAGE_RSSLOUNGE).openConnection();
-            urlConnection.setDoOutput(true);
-            urlConnection.setChunkedStreamingMode(0);
+            JSONObject jsonResponse = applyHttpRequest(LOGIN_PAGE_RSSLOUNGE,
+                    urlParameters);
 
-            DataOutputStream out = new DataOutputStream(
-                    urlConnection.getOutputStream());
-            out.writeBytes(urlParameters);
-            out.flush();
-            out.close();
-
-            if (urlConnection.getResponseCode() == 200) {
-                JSONObject jsonResponse = new JSONObject(
-                        streamToString(urlConnection.getInputStream()));
-                result = jsonResponse.getBoolean("success") == true;
-            }else{
-                throw new LoginLoungeException();
+            if (jsonResponse.getBoolean("success") == true) {
+                Log.d(LOG_DEBUG_LOUNGE, "Logged to the server.");
+            } else {
+                throw new AuthenticationFailLoungeException();
             }
-
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } finally {
-            urlConnection.disconnect();
         }
-        return result;
     }
 
     private SessionManager() {
