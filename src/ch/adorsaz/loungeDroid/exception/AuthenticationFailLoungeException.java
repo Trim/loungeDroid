@@ -1,6 +1,6 @@
-package ch.adorsaz.loungeDroid.servercom;
+package ch.adorsaz.loungeDroid.exception;
 
-public class LoginLoungeException extends Exception {
+public class AuthenticationFailLoungeException extends Exception {
 
     @Override
     public String getMessage() {
