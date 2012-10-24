@@ -64,7 +64,7 @@ public class SessionManager {
         mServerUrl = url;
     }
 
-    public void loginLounge() throws AuthenticationFailLoungeException {
+    private void loginLounge() throws AuthenticationFailLoungeException {
         try {
             String urlParameters = LOGIN_GET_RSSLOUNGE + "="
                     + URLEncoder.encode(mLogin, "UTF-8") + "&"
@@ -167,11 +167,11 @@ public class SessionManager {
         } finally {
             urlConnection.disconnect();
         }
-        
-        if(jsonResponse==null){
-            Log.e(LOG_DEBUG_LOUNGE, "jsonResponse is null !");
-        }
 
+        if (jsonResponse == null) {
+            Log.e(LOG_DEBUG_LOUNGE,
+                    "jsonResponse is null ! Cannot access page " + pageUrl);
+        }
         return jsonResponse;
     }
 
