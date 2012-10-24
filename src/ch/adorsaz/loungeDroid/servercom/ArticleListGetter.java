@@ -29,8 +29,23 @@ public class ServerGetter extends AsyncTask<ToDisplay, Object, List<Article>> {
 
     @Override
     protected List<Article> doInBackground(ToDisplay... toDisplay) {
-        getArticles();
-        return null;
+        List<Article> articles = null;
+        try {
+            articles = getArticles();
+        } catch (AuthenticationFailLoungeException e) {
+            // TODO Pass to offline mode
+            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
+                    "Cannot log in. Check your connection. We'll check if we have saved data before.");
+        } catch (GetArticleListException e) {
+            // TODO Pass to offline mode
+            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
+                    "Cannot get article list, are you correctly logged ? Using saved data if available.");
+        } catch (ParseArticleException e) {
+            // TODO Make Toast
+            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
+                    "Cannot parse JSON response. Trying to display already parsed articles. Please contact developpers.");
+        }
+        return articles;
     }
 
     @Override
