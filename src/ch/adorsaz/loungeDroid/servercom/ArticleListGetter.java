@@ -50,6 +50,7 @@ public class ServerGetter extends AsyncTask<ToDisplay, Object, List<Article>> {
 
     @Override
     protected void onPostExecute(List<Article> allArticles) {
+        // TODO : Fill the list activity
     }
 
     private List<Article> getArticles()
