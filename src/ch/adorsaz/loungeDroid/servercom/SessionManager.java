@@ -71,7 +71,7 @@ public class SessionManager {
                     + PASSWORD_GET_RSSLOUNGE + "=" + mPassword + "&"
                     + JSON_GET_RSSLOUNGE;
 
-            JSONObject jsonResponse = applyHttpRequest(LOGIN_PAGE_RSSLOUNGE,
+            JSONObject jsonResponse = doRequest(LOGIN_PAGE_RSSLOUNGE,
                     urlParameters);
 
             if (jsonResponse.getBoolean("success") == true) {
@@ -121,14 +121,11 @@ public class SessionManager {
 
         return result;
     }
-
-    protected JSONObject applyHttpRequest(String pageUrl, String httpParameters) throws AuthenticationFailLoungeException {
+    
+    private JSONObject doRequest(String pageUrl, String httpParameters) throws AuthenticationFailLoungeException{
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
         
-        if(mSessionCookie==null){
-            loginLounge();
-        }
 
         try {
             urlConnection = (HttpURLConnection) new URL(mServerUrl + pageUrl)
@@ -170,7 +167,7 @@ public class SessionManager {
                 }
                 es.close();
             } catch (IOException ex) {
-                // deal with the exception
+                //TODO deal with the exception
             }
         } catch (JSONException e) {
             // TODO Auto-generated catch block
@@ -180,5 +177,13 @@ public class SessionManager {
         }
 
         return jsonResponse;
+    }
+
+    protected JSONObject serverRequest(String pageUrl, String httpParameters) throws AuthenticationFailLoungeException {
+        if(mSessionCookie==null){
+            loginLounge();
+        }
+
+        return doRequest(pageUrl, httpParameters);
     }
 }

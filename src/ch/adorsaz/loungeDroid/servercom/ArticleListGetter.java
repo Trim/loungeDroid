@@ -67,7 +67,7 @@ public class ArticleListGetter extends
         List<Article> articleList = new LinkedList<Article>();
         JSONArray messages = null;
 
-        JSONObject jsonResponse = mSessionManager.applyHttpRequest(
+        JSONObject jsonResponse = mSessionManager.serverRequest(
                 ARTICLES_PAGE_RSSLOUNGE, SessionManager.JSON_GET_RSSLOUNGE);
 
         // TODO : check if message object array exists if all feeds are read and
