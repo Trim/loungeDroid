@@ -122,8 +122,8 @@ public class SessionManager {
         return result;
     }
 
-    private JSONObject doRequest(String pageUrl, String httpParameters)
-        throws AuthenticationFailLoungeException {
+    private synchronized JSONObject doRequest(String pageUrl,
+            String httpParameters) throws AuthenticationFailLoungeException {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
 
