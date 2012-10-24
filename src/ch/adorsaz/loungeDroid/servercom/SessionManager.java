@@ -122,9 +122,13 @@ public class SessionManager {
         return result;
     }
 
-    protected JSONObject applyHttpRequest(String pageUrl, String httpParameters) {
+    protected JSONObject applyHttpRequest(String pageUrl, String httpParameters) throws AuthenticationFailLoungeException {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
+        
+        if(mSessionCookie==null){
+            loginLounge();
+        }
 
         try {
             urlConnection = (HttpURLConnection) new URL(mServerUrl + pageUrl)
