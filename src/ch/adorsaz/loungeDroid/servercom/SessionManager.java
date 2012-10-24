@@ -35,7 +35,7 @@ public class SessionManager {
     private final static String PASSWORD_GET_RSSLOUNGE = "password";
     protected final static String JSON_GET_RSSLOUNGE = "json=true";
 
-    private final static String LOG_DEBUG_LOUNGE = "loungeDroid.server :";
+    protected final static String LOG_DEBUG_LOUNGE = "loungeDroid.server :";
 
     public final static SessionManager getInstance(Context context) {
         if (mSessionManager == null) {
