@@ -1,11 +1,17 @@
 package ch.adorsaz.loungeDroid.servercom;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.adorsaz.loungeDroid.article.Article;
 import ch.adorsaz.loungeDroid.article.ToDisplay;
+import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
+import ch.adorsaz.loungeDroid.exception.GetArticleListException;
+import ch.adorsaz.loungeDroid.exception.ParseArticleException;
 import android.os.AsyncTask;
 import android.util.Log;
 
