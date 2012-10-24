@@ -12,13 +12,14 @@ import android.util.Log;
 /*
  * This interface implements minimum required to connect to a server.
  */
-public class ServerGetter extends AsyncTask<ToDisplay, Object, List<Article>> {
+public class ArticleListGetter extends
+        AsyncTask<ToDisplay, Object, List<Article>> {
     private SessionManager mSessionManager = SessionManager.getInstance(null);
 
     /* Some urls needed to get feeds */
     private final static String ARTICLES_PAGE_RSSLOUNGE = "/item/list";
 
-    public ServerGetter() {
+    public ArticleListGetter() {
 
     }
 
