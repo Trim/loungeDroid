@@ -12,21 +12,27 @@ import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 import ch.adorsaz.loungeDroid.exception.GetArticleListException;
 import ch.adorsaz.loungeDroid.exception.ParseArticleException;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
-/*
- * This interface implements minimum required to connect to a server.
- */
 public class ArticleListGetter extends
         AsyncTask<ToDisplay, Object, List<Article>> {
-    private SessionManager mSessionManager = SessionManager.getInstance(null);
+    // TODO Pass context
+    private SessionManager mSessionManager = null;
+    private Activity mActivity = null;
+    private ToDisplay mToDisplay = null;
 
     /* Some urls needed to get feeds */
     private final static String ARTICLES_PAGE_RSSLOUNGE = "/item/list";
+    private final static String DISPLAY_ALL_PARAMS = "unread=0&starred=0"; 
+    private final static String DISPLAY_READ_PARAMS = "unread=1&starred=0"; 
+    private final static String DISPLAY_STARRED_PARAMS = "unread=0&starred=1"; 
 
-    public ArticleListGetter() {
 
+    public ArticleListGetter(ToDisplay toDisplay, Activity activity) {
+        mActivity=activity;
+        mToDisplay=toDisplay;
     }
 
     @Override
@@ -67,6 +73,7 @@ public class ArticleListGetter extends
         List<Article> articleList = new LinkedList<Article>();
         JSONArray messages = null;
 
+        // TODO : add params accorinding to ToDiplay
         JSONObject jsonResponse = mSessionManager.serverRequest(
                 ARTICLES_PAGE_RSSLOUNGE, SessionManager.JSON_GET_RSSLOUNGE);
 
