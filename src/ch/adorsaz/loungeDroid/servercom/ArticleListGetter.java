@@ -91,11 +91,12 @@ public class ArticleListGetter extends
                 String content = thisMessage.getString("content");
                 String author = thisMessage.getString("name");
                 String link = thisMessage.getString("link");
+                String icon = thisMessage.getString("icon");
                 Boolean isRead = thisMessage.getInt("unread") == 1;
                 Boolean isStarred = thisMessage.getInt("starred") == 1;
 
                 Article article = new Article(id, day, month, subject, content,
-                        author, link, isRead, isStarred);
+                        author, link, icon, isRead, isStarred);
                 articleList.add(article);
             }
         } catch (JSONException e) {
