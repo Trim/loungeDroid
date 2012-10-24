@@ -73,7 +73,7 @@ public class ArticleListGetter extends
         // TODO : check if message object array exists if all feeds are read and
         // show only unread.
         try {
-            messages = jsonResponse.getJSONArray("message");
+            messages = jsonResponse.getJSONArray("messages");
         } catch (JSONException e) {
             throw new GetArticleListException();
         }
