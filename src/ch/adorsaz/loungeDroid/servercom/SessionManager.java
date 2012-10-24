@@ -121,22 +121,22 @@ public class SessionManager {
 
         return result;
     }
-    
-    private JSONObject doRequest(String pageUrl, String httpParameters) throws AuthenticationFailLoungeException{
+
+    private JSONObject doRequest(String pageUrl, String httpParameters)
+        throws AuthenticationFailLoungeException {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
-        
 
         try {
             urlConnection = (HttpURLConnection) new URL(mServerUrl + pageUrl)
                     .openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setChunkedStreamingMode(0);
-            
-            if(mSessionCookie!=null){
+
+            if (mSessionCookie != null) {
                 urlConnection.setRequestProperty("Cookie", mSessionCookie);
             }
-                        
+
             DataOutputStream out = new DataOutputStream(
                     urlConnection.getOutputStream());
             out.writeBytes(httpParameters);
@@ -144,10 +144,10 @@ public class SessionManager {
             out.close();
 
             if (urlConnection.getResponseCode() == 200) {
-                if(urlConnection.getHeaderField("Set-Cookie")!=null){
-                    mSessionCookie=urlConnection.getHeaderField("Set-Cookie");
+                if (urlConnection.getHeaderField("Set-Cookie") != null) {
+                    mSessionCookie = urlConnection.getHeaderField("Set-Cookie");
                 }
-                
+
                 InputStream responseInput = urlConnection.getInputStream();
                 jsonResponse = new JSONObject(streamToString(responseInput));
                 responseInput.close();
@@ -159,28 +159,25 @@ public class SessionManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            try {
-                InputStream es = urlConnection.getErrorStream();
-                int ret = 0;
-                // read the response body
-                while ((ret = es.read()) > 0) {
-                }
-                es.close();
-            } catch (IOException ex) {
-                //TODO deal with the exception
-            }
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             urlConnection.disconnect();
         }
+        
+        if(jsonResponse==null){
+            Log.e(LOG_DEBUG_LOUNGE, "jsonResponse is null !");
+        }
 
         return jsonResponse;
     }
 
-    protected JSONObject serverRequest(String pageUrl, String httpParameters) throws AuthenticationFailLoungeException {
-        if(mSessionCookie==null){
+    protected JSONObject serverRequest(String pageUrl, String httpParameters)
+        throws AuthenticationFailLoungeException {
+        if (mSessionCookie == null) {
             loginLounge();
         }
 
