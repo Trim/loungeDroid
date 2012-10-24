@@ -40,4 +40,17 @@ public class Article {
     public void setStarred(Boolean isStarred) {
         this.mIsStarred = isStarred;
     }
+
+    public String toString() {
+        String result = "Article[\n";
+        result += "\tId :" + mId + ",\n";
+        result += "\tMonth / Day :" + mMonth + " / " + mDay + ",\n";
+        result += "\tSubject :" + mSubject + ",\n";
+        result += "\tAuthor :" + mAuthor + ",\n";
+        result += "\tLink :" + mLink + ",\n";
+        result += "\tIsRead :" + mIsRead + ",\n";
+        result += "\tIsStarred :" + mIsStarred + ",\n";
+        result += "\tContent :" + mContent;
+        return result;
+    }
 }
