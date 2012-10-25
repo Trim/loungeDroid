@@ -21,30 +21,27 @@ public class ArticleListGetter extends
     // TODO Pass context
     private SessionManager mSessionManager = null;
     private Activity mActivity = null;
-    private ToDisplay mToDisplay = null;
 
     /* Some urls needed to get feeds */
     private final static String ARTICLES_PAGE_RSSLOUNGE = "/item/list";
-    private final static String DISPLAY_ALL_PARAMS = "unread=0&starred=0"; 
-    private final static String DISPLAY_READ_PARAMS = "unread=1&starred=0"; 
-    private final static String DISPLAY_STARRED_PARAMS = "unread=0&starred=1"; 
-
+    private final static String DISPLAY_ALL_PARAMS = "unread=0&starred=0";
+    private final static String DISPLAY_UNREAD_PARAMS = "unread=1&starred=0";
+    private final static String DISPLAY_STARRED_PARAMS = "unread=0&starred=1";
 
     public ArticleListGetter(ToDisplay toDisplay, Activity activity) {
-        mActivity=activity;
-        mToDisplay=toDisplay;
+        mActivity = activity;
     }
 
     @Override
     protected void onPreExecute() {
-        mSessionManager = SessionManager.getInstance(null);
+        mSessionManager = SessionManager.getInstance(mActivity.getApplicationContext());
     }
 
     @Override
     protected List<Article> doInBackground(ToDisplay... toDisplay) {
         List<Article> articles = null;
         try {
-            articles = getArticles();
+            articles = getArticles(toDisplay[0]);
         } catch (AuthenticationFailLoungeException e) {
             // TODO Pass to offline mode
             Log.e(SessionManager.LOG_DEBUG_LOUNGE,
@@ -66,16 +63,27 @@ public class ArticleListGetter extends
         // TODO : Fill the list activity
     }
 
-    private List<Article> getArticles()
+    private List<Article> getArticles(ToDisplay toDisplay)
         throws GetArticleListException,
         AuthenticationFailLoungeException,
         ParseArticleException {
         List<Article> articleList = new LinkedList<Article>();
         JSONArray messages = null;
 
-        // TODO : add params accorinding to ToDiplay
+        String httpParams = SessionManager.JSON_GET_RSSLOUNGE;
+        switch (toDisplay) {
+            case ALL:
+                httpParams += "&" + DISPLAY_ALL_PARAMS;
+                break;
+            case UNREAD:
+                httpParams += "&" + DISPLAY_UNREAD_PARAMS;
+                break;
+            case STARRED:
+                httpParams += "&" + DISPLAY_STARRED_PARAMS;
+                break;
+        }
         JSONObject jsonResponse = mSessionManager.serverRequest(
-                ARTICLES_PAGE_RSSLOUNGE, SessionManager.JSON_GET_RSSLOUNGE);
+                ARTICLES_PAGE_RSSLOUNGE, httpParams);
 
         // TODO : check if message object array exists if all feeds are read and
         // show only unread.
