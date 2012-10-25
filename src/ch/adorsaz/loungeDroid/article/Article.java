@@ -56,4 +56,16 @@ public class Article {
         result += "\tContent : " + mContent;
         return result;
     }
+
+    public Integer getId() {
+        return mId;
+    }
+
+    public void updateReadState() {
+        mIsRead = !mIsRead;
+    }
+
+    public void updateStarredState() {
+        mIsStarred = !mIsStarred;
+    }
 }
