@@ -18,7 +18,6 @@ import android.util.Log;
 
 public class ArticleListGetter extends
         AsyncTask<ToDisplay, Object, List<Article>> {
-    // TODO Pass context
     private SessionManager mSessionManager = null;
     private Activity mActivity = null;
 
