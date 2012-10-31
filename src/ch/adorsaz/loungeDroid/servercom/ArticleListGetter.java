@@ -12,14 +12,14 @@ import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 import ch.adorsaz.loungeDroid.exception.GetArticleListException;
 import ch.adorsaz.loungeDroid.exception.ParseArticleException;
-import android.app.Activity;
+import ch.adorsaz.loungeDroid.gui.ArticleListActivity;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class ArticleListGetter extends
         AsyncTask<ToDisplay, Object, List<Article>> {
     private SessionManager mSessionManager = null;
-    private Activity mActivity = null;
+    private ArticleListActivity mActivity = null;
 
     /* Some urls needed to get feeds */
     private final static String ARTICLES_PAGE_RSSLOUNGE = "/item/list";
@@ -27,7 +27,7 @@ public class ArticleListGetter extends
     private final static String DISPLAY_UNREAD_PARAMS = "unread=1&starred=0";
     private final static String DISPLAY_STARRED_PARAMS = "unread=0&starred=1";
 
-    public ArticleListGetter(ToDisplay toDisplay, Activity activity) {
+    public ArticleListGetter(ArticleListActivity activity) {
         mActivity = activity;
     }
 
