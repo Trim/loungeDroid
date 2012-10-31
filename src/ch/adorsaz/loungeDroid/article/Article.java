@@ -68,4 +68,17 @@ public class Article {
     public void updateStarredState() {
         mIsStarred = !mIsStarred;
     }
+
+    public String getSubject() {
+        return mSubject;
+    }
+
+    public String getAuthor() {
+        return mAuthor;
+    }
+
+    public String getDate() {
+        return mDay + "." + mMonth;
+    }
+
 }
