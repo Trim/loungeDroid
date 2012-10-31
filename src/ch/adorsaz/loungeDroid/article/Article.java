@@ -1,6 +1,9 @@
 package ch.adorsaz.loungeDroid.article;
 
-public class Article {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Article implements Parcelable {
     private Integer mId;
     private Integer mDay;
     private Integer mMonth;
@@ -81,4 +84,52 @@ public class Article {
         return mDay + "." + mMonth;
     }
 
+    /*
+     * Next field, methods and creator are needed to use Parcelabel. That's
+     * needed to pass easier and faster Article from one activity to another.
+     */
+    public static final Parcelable.Creator<Article> CREATOR = new Parcelable.Creator<Article>() {
+        public Article createFromParcel(Parcel in) {
+            return new Article(in);
+        }
+
+        public Article[] newArray(int size) {
+            return new Article[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mId);
+        dest.writeInt(mDay);
+        dest.writeInt(mMonth);
+        dest.writeString(mSubject);
+        dest.writeString(mContent);
+        dest.writeString(mAuthor);
+        dest.writeString(mLink);
+        dest.writeString(mIcon);
+        dest.writeValue(mIsRead);
+        dest.writeValue(mIsStarred);
+    }
+
+    private Article(Parcel parcel) {
+        mId = parcel.readInt();
+        mDay = parcel.readInt();
+        mMonth = parcel.readInt();
+        mSubject = parcel.readString();
+        mContent = parcel.readString();
+        mAuthor = parcel.readString();
+        mLink = parcel.readString();
+        mIcon = parcel.readString();
+        // TODO : check how read Boolean
+        mIsRead = (Boolean) parcel.readValue(null);
+        mIsStarred = (Boolean) parcel.readValue(null);
+    }
+    /* End of tools for Parcelable */
 }
