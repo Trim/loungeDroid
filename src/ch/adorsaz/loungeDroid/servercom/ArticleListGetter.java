@@ -60,6 +60,8 @@ public class ArticleListGetter extends
     @Override
     protected void onPostExecute(List<Article> allArticles) {
         // TODO : Fill the list activity
+        mActivity.updateArticleList(allArticles);
+        Log.d("loungeDroid", "Finish to update Activity");
     }
 
     private List<Article> getArticles(ToDisplay toDisplay)
