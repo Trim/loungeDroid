@@ -119,10 +119,10 @@ public class ArticleListGetter extends
             throw new ParseArticleException();
         }
 
-        if (articleList.get(0) != null) {
+        /*if (articleList.get(0) != null) {
             Log.d(SessionManager.LOG_DEBUG_LOUNGE, "First article : "
                     + articleList.get(0).toString());
-        }
+        }*/
         return articleList;
     }
 }
