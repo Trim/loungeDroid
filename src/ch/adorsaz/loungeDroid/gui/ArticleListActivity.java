@@ -33,7 +33,7 @@ public class ArticleListActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        fetchNews(ToDisplay.UNREAD);
+        fetchNews();
     }
 
     @Override
@@ -42,6 +42,41 @@ public class ArticleListActivity extends ListActivity {
         inflater.inflate(R.menu.activity_article_list, menu);
         disableToDisplayMenu(menu);
         return true;
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        disableToDisplayMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                fetchNews();
+                break;
+            case R.id.showAllMenu:
+                mDisplayChoice = ToDisplay.ALL;
+                fetchNews();
+                break;
+            case R.id.showUnreadMenu:
+                mDisplayChoice = ToDisplay.UNREAD;
+                fetchNews();
+                break;
+            case R.id.showStarredMenu:
+                mDisplayChoice = ToDisplay.STARRED;
+                fetchNews();
+                break;
+            //case R.id.mainSettings:
+                /*
+                 * Intent intent; intent = new Intent(getBaseContext(),
+                 * Preference.class); startActivity(intent);
+                 */
+              //  break;
+        }
+        return false;
     }
 
     public void updateArticleList(List<Article> articleList) {
@@ -63,11 +98,13 @@ public class ArticleListActivity extends ListActivity {
                 startActivity(intent);
             }
         });
+        
+        registerForContextMenu(listView);
     }
 
-    private void fetchNews(ToDisplay toDisplay) {
+    private void fetchNews() {
         ArticleListGetter getter = new ArticleListGetter(this);
-        getter.execute(toDisplay);
+        getter.execute(mDisplayChoice);
     }
 
     private void disableToDisplayMenu(Menu menu) {
@@ -79,16 +116,18 @@ public class ArticleListActivity extends ListActivity {
         enableMenuItem(showUnreadItem);
         enableMenuItem(showStarredItem);
 
-        switch (mDisplayChoice) {
-            case ALL:
-                disableMenuItem(menu, R.id.showAllMenu);
-                break;
-            case UNREAD:
-                disableMenuItem(menu, R.id.showUnreadMenu);
-                break;
-            case STARRED:
-                disableMenuItem(menu, R.id.showStarredMenu);
-                break;
+        if (mDisplayChoice != null) {
+            switch (mDisplayChoice) {
+                case ALL:
+                    disableMenuItem(menu, R.id.showAllMenu);
+                    break;
+                case UNREAD:
+                    disableMenuItem(menu, R.id.showUnreadMenu);
+                    break;
+                case STARRED:
+                    disableMenuItem(menu, R.id.showStarredMenu);
+                    break;
+            }
         }
 
     }
