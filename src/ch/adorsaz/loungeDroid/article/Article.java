@@ -89,6 +89,10 @@ public class Article implements Parcelable {
         return mContent;
     }
 
+    public String getLink() {
+        return mLink;
+    }
+
     /*
      * Next field, methods and creator are needed to use Parcelabel. That's
      * needed to pass easier and faster Article from one activity to another.
