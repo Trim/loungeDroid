@@ -22,7 +22,8 @@ public class Article implements Parcelable {
         mDay = day;
         mMonth = month;
         mSubject = subject;
-        mContent = content;
+        mContent = "<?xml version='1.0' encoding='utf-8' ?>" + "<html><body>"
+                + content + " </body></html>";
         mAuthor = author;
         mLink = link;
         mIcon = icon;
@@ -82,6 +83,10 @@ public class Article implements Parcelable {
 
     public String getDate() {
         return mDay + "." + mMonth;
+    }
+
+    public String getContent() {
+        return mContent;
     }
 
     /*
