@@ -28,6 +28,8 @@ public class ArticleListActivity extends ListActivity {
     private List<Article> mArticleList = null;
     private ArticleAdapter mArticleAdapter = null;
     private ToDisplay mDisplayChoice = null;
+    
+    protected static final String ARTICLE_KEY = "article";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +87,7 @@ public class ArticleListActivity extends ListActivity {
                 R.layout.articlelist_item, R.id.articleItemTitle, mArticleList);
 
         ListView listView = getListView();
-        listView.setDividerHeight(5);
+        //listView.setDividerHeight(5);
         listView.setScrollingCacheEnabled(false); // TODO : Just save some
                                                   // memory, check if needed
         listView.setOnItemClickListener(new OnItemClickListener() {
@@ -94,12 +96,13 @@ public class ArticleListActivity extends ListActivity {
 
                 Intent intent = new Intent(ArticleListActivity.this,
                         ArticleDetailActivity.class);
-                intent.putExtra("article", mArticleList.get(position));
+                intent.putExtra(ARTICLE_KEY, mArticleList.get(position));
                 startActivity(intent);
             }
         });
         
-        registerForContextMenu(listView);
+        setListAdapter(mArticleAdapter);
+        //registerForContextMenu(listView);
     }
 
     private void fetchNews() {
@@ -167,8 +170,9 @@ public class ArticleListActivity extends ListActivity {
             }
 
             // Manage article
+            LinearLayout articleItem = null;
             if (article != null) {
-                LinearLayout articleItem = (LinearLayout) convertView
+                articleItem = (LinearLayout) convertView
                         .findViewById(R.id.itemLinearLayout);
                 if (articleItem != null) {
                     TextView articleItemTitle = (TextView) articleItem
@@ -192,7 +196,7 @@ public class ArticleListActivity extends ListActivity {
                     }
                 }
             }
-            return null;
+            return articleItem;
         }
     }
 }
