@@ -17,51 +17,45 @@ import org.json.JSONObject;
 
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class SessionManager {
-    private String mLogin = null;
-    private String mPassword = null;
-    private String mServerUrl = null;
-    private String mSessionCookie = null;
+    private static String mLogin = null;
+    private static String mPassword = null;
+    private static String mServerUrl = null;
+    private static String mSessionCookie = null;
     private static SessionManager mSessionManager = null;
+    private static Context mApplicationContext = null;
 
     private final static String LOGIN_PAGE_RSSLOUNGE = "/index/login";
     private final static String LOGIN_GET_RSSLOUNGE = "username";
     private final static String PASSWORD_GET_RSSLOUNGE = "password";
     protected final static String JSON_GET_RSSLOUNGE = "json=true";
 
+    // Preferences :
+    private static final String SHARED_PREFERENCES = "shared_preferences";
+    private static final String URL_SERVER_PREF = "url_server_pref";
+    private static final String USER_SERVER_PREF = "username_server_pref";
+    private static final String PASSWORD_SERVER_PREF = "password_server_pref";
+
+    private static final String SESSION_COOKIE_SETTINGS = "session_cookie_settings";
+
     protected final static String LOG_DEBUG_LOUNGE = "loungeDroid.server :";
 
     public final static SessionManager getInstance(Context context) {
         if (mSessionManager == null) {
             mSessionManager = new SessionManager();
+            mApplicationContext = context;
+            mSessionManager.getPreferences();
         }
 
-        // mSessionManager.getPreferences(context);
-
         return mSessionManager;
-    }
-
-    public final static SessionManager getInstance(String url, String login,
-            String password) {
-        if (mSessionManager == null) {
-            mSessionManager = new SessionManager();
-        }
-
-        mSessionManager.setPreferences(url, login, password);
-
-        return mSessionManager;
-    }
-
-    private void setPreferences(String url, String login, String password) {
-        mLogin = login;
-        mPassword = password;
-        mServerUrl = url;
     }
 
     private void loginLounge() throws AuthenticationFailLoungeException {
@@ -76,6 +70,7 @@ public class SessionManager {
 
             if (jsonResponse.getBoolean("success") == true) {
                 Log.d(LOG_DEBUG_LOUNGE, "Logged to the server.");
+                setCookiePref(mSessionCookie);
             } else {
                 throw new AuthenticationFailLoungeException();
             }
@@ -91,19 +86,25 @@ public class SessionManager {
     private SessionManager() {
     }
 
-    private void getPreferences(Context context) {
-        if (context != null) {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(context);
+    private void getPreferences() {
+        if (mApplicationContext != null) {
+            SharedPreferences pref = mApplicationContext.getSharedPreferences(
+                    SHARED_PREFERENCES, Activity.MODE_PRIVATE);
 
-            mServerUrl = prefs.getString("urlPref", "");
+            mServerUrl = pref.getString(URL_SERVER_PREF, "");
+
             if (!mServerUrl.startsWith("http://")
                     && !mServerUrl.startsWith("https://")) {
                 mServerUrl = "http://" + mServerUrl;
             }
 
-            mLogin = Uri.encode(prefs.getString("loginPref", ""));
-            mPassword = Uri.encode(prefs.getString("passwordPref", ""));
+            mServerUrl = Uri.encode(mServerUrl);
+            mLogin = Uri.encode(pref.getString(USER_SERVER_PREF, ""));
+            mPassword = Uri.encode(pref.getString(PASSWORD_SERVER_PREF, ""));
+
+            if (pref.contains(SESSION_COOKIE_SETTINGS)) {
+                mSessionCookie = pref.getString(SESSION_COOKIE_SETTINGS, "");
+            }
         }
     }
 
@@ -133,7 +134,7 @@ public class SessionManager {
             urlConnection.setDoOutput(true);
             urlConnection.setChunkedStreamingMode(0);
 
-            if (mSessionCookie != null) {
+            if (mSessionCookie != null && !(mSessionCookie.length() == 0)) {
                 urlConnection.setRequestProperty("Cookie", mSessionCookie);
             }
 
@@ -175,9 +176,18 @@ public class SessionManager {
         return jsonResponse;
     }
 
+    private void setCookiePref(String cookie) {
+        Editor editor = mApplicationContext.getSharedPreferences(
+                SHARED_PREFERENCES, Activity.MODE_PRIVATE).edit();
+        editor.putString(SESSION_COOKIE_SETTINGS, mSessionCookie);
+        // TODO : If make application for API >= 9, replace commit() by apply()
+        editor.commit();
+    }
+
     protected JSONObject serverRequest(String pageUrl, String httpParameters)
         throws AuthenticationFailLoungeException {
-        if (mSessionCookie == null) {
+        // TODO : If make application for API >= 9 replace test on length() by isEmpty()
+        if (mSessionCookie == null || mSessionCookie.length() == 0) {
             loginLounge();
         }
 
