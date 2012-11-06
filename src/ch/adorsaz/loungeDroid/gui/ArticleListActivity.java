@@ -19,8 +19,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class ArticleListActivity extends ListActivity {
@@ -170,10 +170,10 @@ public class ArticleListActivity extends ListActivity {
             }
 
             // Manage article
-            LinearLayout articleItem = null;
+            RelativeLayout articleItem = null;
             if (article != null) {
-                articleItem = (LinearLayout) convertView
-                        .findViewById(R.id.itemLinearLayout);
+                articleItem = (RelativeLayout) convertView
+                        .findViewById(R.id.itemRelativeLayout);
                 if (articleItem != null) {
                     TextView articleItemTitle = (TextView) articleItem
                             .findViewById(R.id.articleItemTitle);
