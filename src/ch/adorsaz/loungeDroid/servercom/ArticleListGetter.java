@@ -7,12 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.adorsaz.loungeDroid.activities.ArticleListActivity;
 import ch.adorsaz.loungeDroid.article.Article;
 import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 import ch.adorsaz.loungeDroid.exception.GetArticleListException;
 import ch.adorsaz.loungeDroid.exception.ParseArticleException;
-import ch.adorsaz.loungeDroid.gui.ArticleListActivity;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
@@ -34,7 +34,8 @@ public class ArticleListGetter extends
 
     @Override
     protected void onPreExecute() {
-        mSessionManager = SessionManager.getInstance(mActivity.getApplicationContext());
+        mSessionManager = SessionManager.getInstance(mActivity
+                .getApplicationContext());
     }
 
     @Override
