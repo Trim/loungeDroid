@@ -3,24 +3,23 @@ package ch.adorsaz.loungeDroid.servercom;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.adorsaz.loungeDroid.activities.ArticleDetailActivity;
 import ch.adorsaz.loungeDroid.article.Article;
-import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 import ch.adorsaz.loungeDroid.exception.StarredStateUpdateException;
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class ArticleStarredStateUpdater extends
         AsyncTask<Article, Object, Article> {
     private SessionManager mSessionManager = null;
-    private Activity mActivity = null;
+    private ArticleDetailActivity mActivity = null;
 
     /* Some urls needed to get feeds */
     private final static String STARREDSTATE_PAGE_RSSLOUNGE = "/item/star";
     private final static String ID_GET_RSSLOUNGE = "id";
 
-    public ArticleStarredStateUpdater(ToDisplay toDisplay, Activity activity) {
+    public ArticleStarredStateUpdater(ArticleDetailActivity activity) {
         mActivity = activity;
     }
 
@@ -49,9 +48,8 @@ public class ArticleStarredStateUpdater extends
 
     @Override
     protected void onPostExecute(Article article) {
-        // TODO : Update the list activity
         if(article!=null){
-            
+            mActivity.updateStarredButton();
         }
     }
 
