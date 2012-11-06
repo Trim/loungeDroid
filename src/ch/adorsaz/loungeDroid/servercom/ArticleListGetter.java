@@ -14,6 +14,7 @@ import ch.adorsaz.loungeDroid.exception.GetArticleListException;
 import ch.adorsaz.loungeDroid.exception.ParseArticleException;
 import ch.adorsaz.loungeDroid.gui.ArticleListActivity;
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
 
 public class ArticleListGetter extends
@@ -86,8 +87,6 @@ public class ArticleListGetter extends
         JSONObject jsonResponse = mSessionManager.serverRequest(
                 ARTICLES_PAGE_RSSLOUNGE, httpParams);
 
-        // TODO : check if message object array exists if all feeds are read and
-        // show only unread.
         try {
             messages = jsonResponse.getJSONArray("messages");
         } catch (JSONException e) {
@@ -105,10 +104,11 @@ public class ArticleListGetter extends
                         + Character.getNumericValue(datetime.charAt(6));
                 String subject = thisMessage.getString("title");
                 String content = thisMessage.getString("content");
-                String author = thisMessage.getString("name");
+                String author = Html.fromHtml(thisMessage.getString("name"))
+                        .toString();
                 String link = thisMessage.getString("link");
                 String icon = thisMessage.getString("icon");
-                Boolean isRead = thisMessage.getInt("unread") == 1;
+                Boolean isRead = thisMessage.getInt("unread") == 0;
                 Boolean isStarred = thisMessage.getInt("starred") == 1;
 
                 Article article = new Article(id, day, month, subject, content,
@@ -118,11 +118,6 @@ public class ArticleListGetter extends
         } catch (JSONException e) {
             throw new ParseArticleException();
         }
-
-        /*if (articleList.get(0) != null) {
-            Log.d(SessionManager.LOG_DEBUG_LOUNGE, "First article : "
-                    + articleList.get(0).toString());
-        }*/
         return articleList;
     }
 }
