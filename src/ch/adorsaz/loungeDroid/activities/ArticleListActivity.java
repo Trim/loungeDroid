@@ -1,4 +1,4 @@
-package ch.adorsaz.loungeDroid.gui;
+package ch.adorsaz.loungeDroid.activities;
 
 import java.util.List;
 
@@ -7,9 +7,14 @@ import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.article.Article;
 import ch.adorsaz.loungeDroid.servercom.ArticleListGetter;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,15 +33,71 @@ public class ArticleListActivity extends ListActivity {
     private List<Article> mArticleList = null;
     private ArticleAdapter mArticleAdapter = null;
     private ToDisplay mDisplayChoice = null;
-    
+    private String mServerUrl = null;
+    private String mUsername = null;
+    private String mPassword = null;
+
     protected static final String ARTICLE_KEY = "article";
+
+    private static final String SHARED_PREFERENCES = "shared_preferences";
+    private static final String URL_SERVER_PREF = "url_server_pref";
+    private static final String DISPLAY_BEHAVIOUR_PREF = "todisplay_pref";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        fetchNews();
+        SharedPreferences pref = getSharedPreferences(SHARED_PREFERENCES,
+                Activity.MODE_PRIVATE);
+        if (pref.getString(URL_SERVER_PREF, "").equals("")) {
+            Intent intent = new Intent(ArticleListActivity.this,
+                    SettingsActivity.class);
+            startActivity(intent);
+        }
+
+        if (pref.getString(DISPLAY_BEHAVIOUR_PREF, "ALWAYS_PROMPT").equals(
+                "ALWAYS_PROMPT")) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.displayMenu));
+            builder.setSingleChoiceItems(R.array.pref_human_toDisplay,
+                    R.array.pref_values_toDisplay, new DisplayDialogListener())
+                    .create().show();
+        } else {
+            mDisplayChoice = ToDisplay.valueOf(pref.getString(
+                    DISPLAY_BEHAVIOUR_PREF, "ALL"));
+        }
+
+        //if (mArticleList==null) {
+            //fetchNews();
+        //}
     }
+
+    private class DisplayDialogListener implements
+            DialogInterface.OnClickListener {
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            // To know what was the last choice of the user and select it by
+            // default
+            SharedPreferences prefs;
+            prefs = PreferenceManager
+                    .getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor prefEditor = prefs.edit();
+            prefEditor.putInt(DISPLAY_BEHAVIOUR_PREF, which);
+            prefEditor.commit();
+
+            //Intent intent = new Intent(getApplicationContext(), ArticleListActivity.class);
+            //startActivity(intent);
+        }
+    }
+
+    /*
+     * @Override protected void onResume(){ Intent intent = getIntent(); Article
+     * articleUpdated = intent.getParcelableExtra(ARTICLE_KEY); for(Article
+     * articleIterator : mArticleList){
+     * if(articleIterator.getId()==articleUpdated.getId()){
+     * articleIterator=articleUpdated; } } updateArticleList(mArticleList); }
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -45,9 +106,9 @@ public class ArticleListActivity extends ListActivity {
         disableToDisplayMenu(menu);
         return true;
     }
-    
+
     @Override
-    public boolean onPrepareOptionsMenu (Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         disableToDisplayMenu(menu);
         return true;
     }
@@ -71,12 +132,12 @@ public class ArticleListActivity extends ListActivity {
                 mDisplayChoice = ToDisplay.STARRED;
                 fetchNews();
                 break;
-            //case R.id.mainSettings:
-                /*
-                 * Intent intent; intent = new Intent(getBaseContext(),
-                 * Preference.class); startActivity(intent);
-                 */
-              //  break;
+        // case R.id.mainSettings:
+        /*
+         * Intent intent; intent = new Intent(getBaseContext(),
+         * Preference.class); startActivity(intent);
+         */
+        // break;
         }
         return false;
     }
@@ -87,7 +148,6 @@ public class ArticleListActivity extends ListActivity {
                 R.layout.articlelist_item, R.id.articleItemTitle, mArticleList);
 
         ListView listView = getListView();
-        //listView.setDividerHeight(5);
         listView.setScrollingCacheEnabled(false); // TODO : Just save some
                                                   // memory, check if needed
         listView.setOnItemClickListener(new OnItemClickListener() {
@@ -100,9 +160,8 @@ public class ArticleListActivity extends ListActivity {
                 startActivity(intent);
             }
         });
-        
+
         setListAdapter(mArticleAdapter);
-        //registerForContextMenu(listView);
     }
 
     private void fetchNews() {

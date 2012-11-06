@@ -1,18 +1,33 @@
 <resources>
 
     <string name="app_name">loungeDroid</string>
+
+    <!-- List Activity -->
+    <string name="title_activity_article_list">loungeDroid : view news</string>
+
+    <!-- Detail Activity -->
+    <string name="title_activity_article_detail">loungeDroid : view an article</string>
     <string name="browserButton">In Browser</string>
     <string name="starIt">Star it!</string>
     <string name="unStar">Unstar</string>
     <string name="markAsRead">Mark as read</string>
     <string name="notRead">Mark as unread</string>
+
+    <!-- Option Menu in ArticleListActivity -->
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_article_list">loungeDroid : view news</string>
-    <string name="title_activity_article_detail">loungeDroid : view an article</string>
     <string name="refresh">Refresh</string>
     <string name="displayMenu">Display …</string>
     <string name="showAll">Show all</string>
     <string name="showUnread">Show unread</string>
     <string name="showStarred">Show starred</string>
+
+    <!-- Preferences -->
+    <string name="title_activity_settings">Preferences</string>
+    <string name="pref_server_category">Server configuration</string>
+    <string name="pref_server_url">Server url (http://example.org)</string>
+    <string name="pref_server_username">User name</string>
+    <string name="pref_server_password">Password</string>
+    <string name="pref_behaviour_category">LoungeDroid behaviours</string>
+    <string name="pref_behaviour_todisplay">Articles to display on start…</string>
 
 </resources>

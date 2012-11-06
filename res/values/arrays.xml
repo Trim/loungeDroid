@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_human_toDisplay">
+        <item>Always prompt</item>
+        <item>Show all articles</item>
+        <item>Show unread articles</item>
+        <item>Show starred articles</item>
+    </string-array>
+    <string-array name="pref_values_toDisplay">
+        <item>ALWAYS_PROMPT</item>
+        <item>ALL</item>
+        <item>UNREAD</item>
+        <item>STARRED</item>
+    </string-array>
+
+</resources>
