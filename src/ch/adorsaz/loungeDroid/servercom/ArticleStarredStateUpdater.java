@@ -65,7 +65,7 @@ public class ArticleStarredStateUpdater extends
 
         try {
             // TODO : check if we want to do something with starred number
-            Integer nmStarred = jsonResponse.getInt("starred");
+            Integer nbStarred = jsonResponse.getInt("starred");
             article.updateStarredState();
         } catch (JSONException e) {
             throw new StarredStateUpdateException();
