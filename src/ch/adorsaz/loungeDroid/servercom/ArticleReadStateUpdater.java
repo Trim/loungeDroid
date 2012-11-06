@@ -3,24 +3,23 @@ package ch.adorsaz.loungeDroid.servercom;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.adorsaz.loungeDroid.activities.ArticleDetailActivity;
 import ch.adorsaz.loungeDroid.article.Article;
-import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 import ch.adorsaz.loungeDroid.exception.ReadStateUpdateException;
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class ArticleReadStateUpdater extends
         AsyncTask<Article, Object, Article> {
     private SessionManager mSessionManager = null;
-    private Activity mActivity = null;
+    private ArticleDetailActivity mActivity = null;
 
     /* Some urls needed to get feeds */
     private final static String READSTATE_PAGE_RSSLOUNGE = "/item/mark";
     private final static String ID_GET_RSSLOUNGE = "id";
 
-    public ArticleReadStateUpdater(ToDisplay toDisplay, Activity activity) {
+    public ArticleReadStateUpdater(ArticleDetailActivity activity) {
         mActivity = activity;
     }
 
@@ -49,9 +48,8 @@ public class ArticleReadStateUpdater extends
 
     @Override
     protected void onPostExecute(Article article) {
-        // TODO : Update the list activity
         if(article!=null){
-            
+            mActivity.updateReadButton();
         }
     }
 
