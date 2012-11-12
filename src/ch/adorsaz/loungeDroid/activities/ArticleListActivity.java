@@ -6,6 +6,7 @@ import ch.adorsaz.loungeDroid.R;
 import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.article.Article;
 import ch.adorsaz.loungeDroid.servercom.ArticleListGetter;
+import ch.adorsaz.loungeDroid.servercom.SessionManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -118,8 +120,14 @@ public class ArticleListActivity extends ListActivity {
                 fetchNews();
                 break;
             case R.id.menu_settings:
+                Editor editor = getSharedPreferences(
+                        SettingsActivity.SHARED_PREFERENCES,
+                        Activity.MODE_PRIVATE).edit();
+                editor.putBoolean(SettingsActivity.WANT_TO_EDIT_PREF, true);
+                editor.commit();
+
                 Intent intent;
-                intent = new Intent(getBaseContext(), SettingsActivity.class);
+                intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
         }
