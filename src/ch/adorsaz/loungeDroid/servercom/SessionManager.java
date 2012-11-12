@@ -6,17 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.apache.http.auth.AuthenticationException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.adorsaz.loungeDroid.activities.ArticleListActivity;
 import ch.adorsaz.loungeDroid.activities.SettingsActivity;
 import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 
@@ -25,8 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -58,15 +53,6 @@ public class SessionManager {
     }
 
     private void loginLounge() throws AuthenticationFailLoungeException {
-        /*
-         * If we want to login, also mSessionCookie is null or invalid.
-         * 
-         * So, we try to do the login request on the server to get new Cookie.
-         * If the request doesn't succeed, there's two possibilities : - if
-         * there's no cookie, authentication is false - if there's cookie, it
-         * was too old and we should try again (with lucky, we can connect again
-         * with old cookie and receive a newer)
-         */
         try {
             String urlParameters = LOGIN_GET_RSSLOUNGE + "="
                     + URLEncoder.encode(mLogin, "UTF-8") + "&"
@@ -176,6 +162,10 @@ public class SessionManager {
 
         } catch (MalformedURLException e) {
             Log.e(LOG_DEBUG_LOUNGE, "Malformed url : " + mServerUrl);
+
+            Toast.makeText(mApplicationContext,
+                    "There's a typo in server url.\nPlease check it.",
+                    Toast.LENGTH_LONG).show();
             Intent intent = new Intent(mApplicationContext,
                     SettingsActivity.class);
             mApplicationContext.startActivity(intent);
@@ -203,14 +193,11 @@ public class SessionManager {
                 SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
                 .edit();
         editor.putString(SESSION_COOKIE_SETTINGS, mSessionCookie);
-        // TODO : If make application for API >= 9, replace commit() by apply()
         editor.commit();
     }
 
     protected JSONObject serverRequest(String pageUrl, String httpParameters)
         throws AuthenticationFailLoungeException {
-        // TODO : If make application for API >= 9 replace test on length() by
-        // isEmpty()
         if (mSessionCookie == null || mSessionCookie.length() == 0) {
             loginLounge();
         }
