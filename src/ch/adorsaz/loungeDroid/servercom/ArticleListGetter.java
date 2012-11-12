@@ -62,8 +62,6 @@ public class ArticleListGetter extends
                     SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
                     .edit();
             editor.remove(SessionManager.SESSION_COOKIE_SETTINGS);
-            // TODO : If make application for API >= 9, replace commit() by
-            // apply()
             editor.commit();
             articles = null;
         } catch (ParseArticleException e) {
@@ -79,8 +77,6 @@ public class ArticleListGetter extends
                     SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
                     .edit();
             editor.remove(SessionManager.SESSION_COOKIE_SETTINGS);
-            // TODO : If make application for API >= 9, replace commit() by
-            // apply()
             editor.commit();
             articles = null;
         }
