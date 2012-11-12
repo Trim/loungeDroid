@@ -33,30 +33,18 @@ public class ArticleListActivity extends ListActivity {
     private List<Article> mArticleList = null;
     private ArticleAdapter mArticleAdapter = null;
     private ToDisplay mDisplayChoice = null;
-    private String mServerUrl = null;
-    private String mUsername = null;
-    private String mPassword = null;
 
     protected static final String ARTICLE_KEY = "article";
-
-    private static final String SHARED_PREFERENCES = "shared_preferences";
-    private static final String URL_SERVER_PREF = "url_server_pref";
-    private static final String DISPLAY_BEHAVIOUR_PREF = "todisplay_pref";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences pref = getSharedPreferences(SHARED_PREFERENCES,
-                Activity.MODE_PRIVATE);
-        if (pref.getString(URL_SERVER_PREF, "").equals("")) {
-            Intent intent = new Intent(ArticleListActivity.this,
-                    SettingsActivity.class);
-            startActivity(intent);
-        }
+        SharedPreferences pref = getSharedPreferences(
+                SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE);
 
-        if (pref.getString(DISPLAY_BEHAVIOUR_PREF, "ALWAYS_PROMPT").equals(
-                "ALWAYS_PROMPT")) {
+        if (pref.getString(SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
+                "ALWAYS_PROMPT").equals("ALWAYS_PROMPT")) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.displayMenu));
             builder.setSingleChoiceItems(R.array.pref_human_toDisplay,
@@ -64,12 +52,12 @@ public class ArticleListActivity extends ListActivity {
                     .create().show();
         } else {
             mDisplayChoice = ToDisplay.valueOf(pref.getString(
-                    DISPLAY_BEHAVIOUR_PREF, "ALL"));
+                    SettingsActivity.DISPLAY_BEHAVIOUR_PREF, "ALL"));
         }
 
-        //if (mArticleList==null) {
-            //fetchNews();
-        //}
+        if (mArticleList == null) {
+            fetchNews();
+        }
     }
 
     private class DisplayDialogListener implements
@@ -83,11 +71,8 @@ public class ArticleListActivity extends ListActivity {
             prefs = PreferenceManager
                     .getDefaultSharedPreferences(getApplicationContext());
             SharedPreferences.Editor prefEditor = prefs.edit();
-            prefEditor.putInt(DISPLAY_BEHAVIOUR_PREF, which);
+            prefEditor.putInt(SettingsActivity.DISPLAY_BEHAVIOUR_PREF, which);
             prefEditor.commit();
-
-            //Intent intent = new Intent(getApplicationContext(), ArticleListActivity.class);
-            //startActivity(intent);
         }
     }
 
@@ -132,12 +117,11 @@ public class ArticleListActivity extends ListActivity {
                 mDisplayChoice = ToDisplay.STARRED;
                 fetchNews();
                 break;
-        // case R.id.mainSettings:
-        /*
-         * Intent intent; intent = new Intent(getBaseContext(),
-         * Preference.class); startActivity(intent);
-         */
-        // break;
+            case R.id.menu_settings:
+                Intent intent;
+                intent = new Intent(getBaseContext(), SettingsActivity.class);
+                startActivity(intent);
+                break;
         }
         return false;
     }
