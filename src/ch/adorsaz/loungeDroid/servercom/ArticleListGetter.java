@@ -15,6 +15,7 @@ import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.exception.GetArticleListException;
 import ch.adorsaz.loungeDroid.exception.ParseArticleException;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.text.Html;
@@ -29,6 +30,7 @@ public class ArticleListGetter extends
         AsyncTask<ToDisplay, Object, List<Article>> {
     private SessionManager mSessionManager = null;
     private ArticleListActivity mActivity = null;
+    private ProgressDialog mProgressDialog = null;
 
     /* Some urls needed to get specific articles */
     private final static String ARTICLELIST_PAGE_RSSLOUNGE = "/item/list";
@@ -43,7 +45,11 @@ public class ArticleListGetter extends
     @Override
     protected void onPreExecute() {
         mSessionManager = SessionManager.getInstance(mActivity);
-        mActivity.setProgressBarVisibility(true);
+
+        mProgressDialog = new ProgressDialog(mActivity,
+                ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setMessage("Fetching news, please wait...");
+        mProgressDialog.show();
     }
 
     @Override
@@ -98,7 +104,11 @@ public class ArticleListGetter extends
 
     @Override
     protected void onPostExecute(List<Article> allArticles) {
-        mActivity.setProgressBarVisibility(false);
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
+
         if (allArticles != null) {
             mActivity.updateArticleList(allArticles);
             Log.d(SessionManager.LOG_SERVER, "Finish to update Activity");
