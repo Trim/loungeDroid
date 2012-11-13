@@ -69,16 +69,56 @@ public class ArticleListActivity extends ListActivity {
             dialog.dismiss();
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Intent intent = getIntent();
+        int adapterSize = mArticleAdapter.getCount();
+        intent.putExtra("mArticleAdapterSize", adapterSize);
+
+        for (int i = 0; i < adapterSize; i++) {
+            intent.putExtra("mArticleAdapterItem" + i,
+                    mArticleAdapter.getItem(i));
         }
+
+        finish();
     }
 
-    /*
-     * @Override protected void onResume(){ Intent intent = getIntent(); Article
-     * articleUpdated = intent.getParcelableExtra(ARTICLE_KEY); for(Article
-     * articleIterator : mArticleList){
-     * if(articleIterator.getId()==articleUpdated.getId()){
-     * articleIterator=articleUpdated; } } updateArticleList(mArticleList); }
-     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Restore data
+        Intent intent = getIntent();
+        List<Article> articleList = new LinkedList<Article>();
+
+        int adapterSize = intent.getIntExtra("mArticleAdapterSize", 0);
+
+        for (int i = 0; i < adapterSize; i++) {
+            articleList.add((Article) intent
+                    .getParcelableExtra("mArticleAdapterItem" + i));
+        }
+
+        mArticleAdapter = new ArticleAdapter(getApplicationContext(),
+                R.layout.articlelist_item, R.id.articleItemTitle, articleList);
+
+        // Update one article if needed
+        Article articleUpdated = intent.getParcelableExtra(ARTICLE_KEY);
+
+        if (articleUpdated != null) {
+            for (int i = 0; i < mArticleAdapter.getCount(); i++) {
+                Article articleIterator = mArticleAdapter.getItem(i);
+                if (articleIterator.getId() == articleUpdated.getId()) {
+                    mArticleAdapter.remove(articleIterator);
+                    mArticleAdapter.insert(articleUpdated, i);
+                }
+            }
+        }
+
+        // Apply restored data
+        updateArticleAdapter();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
