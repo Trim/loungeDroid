@@ -49,15 +49,12 @@ public class ArticleListActivity extends ListActivity {
                 "ALWAYS_PROMPT").equals("ALWAYS_PROMPT")) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.displayMenu));
-            builder.setSingleChoiceItems(R.array.pref_human_toDisplay,
-                    R.array.pref_values_toDisplay, new DisplayDialogListener())
+            builder.setSingleChoiceItems(R.array.startdialog_human_toDisplay,
+                    R.array.startdialog_values_toDisplay, new DisplayDialogListener())
                     .create().show();
         } else {
             mDisplayChoice = ToDisplay.valueOf(pref.getString(
                     SettingsActivity.DISPLAY_BEHAVIOUR_PREF, "ALL"));
-        }
-
-        if (mArticleList == null) {
             fetchNews();
         }
     }
@@ -67,14 +64,11 @@ public class ArticleListActivity extends ListActivity {
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            // To know what was the last choice of the user and select it by
-            // default
-            SharedPreferences prefs;
-            prefs = PreferenceManager
-                    .getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor prefEditor = prefs.edit();
-            prefEditor.putInt(SettingsActivity.DISPLAY_BEHAVIOUR_PREF, which);
-            prefEditor.commit();
+            mDisplayChoice = ToDisplay.values()[which];
+            fetchNews();
+            dialog.dismiss();
+        }
+    }
         }
     }
 
