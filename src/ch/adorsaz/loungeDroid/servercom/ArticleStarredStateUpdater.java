@@ -76,8 +76,9 @@ public class ArticleStarredStateUpdater extends
                 STARREDSTATE_PAGE_RSSLOUNGE, httpParams);
 
         try {
-            // TODO : check if we want to do something with starred number
-            Integer nbStarred = jsonResponse.getInt("starred");
+            // TODO : check if we want to do something with starred number. For
+            // instance keep this getInt to be sure that there wasn't any error.
+            jsonResponse.getInt("starred");
             article.updateStarredState();
         } catch (JSONException e) {
             throw new StarredStateUpdateException();
