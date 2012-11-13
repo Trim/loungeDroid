@@ -1,5 +1,6 @@
 package ch.adorsaz.loungeDroid.activities;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import ch.adorsaz.loungeDroid.R;
@@ -32,7 +33,6 @@ import android.widget.TextView;
 
 public class ArticleListActivity extends ListActivity {
 
-    private List<Article> mArticleList = null;
     private ArticleAdapter mArticleAdapter = null;
     private ToDisplay mDisplayChoice = null;
 
@@ -135,20 +135,21 @@ public class ArticleListActivity extends ListActivity {
     }
 
     public void updateArticleList(List<Article> articleList) {
-        mArticleList = articleList;
         mArticleAdapter = new ArticleAdapter(getApplicationContext(),
-                R.layout.articlelist_item, R.id.articleItemTitle, mArticleList);
+                R.layout.articlelist_item, R.id.articleItemTitle, articleList);
+        updateArticleAdapter();
+    }
 
+    private void updateArticleAdapter() {
         ListView listView = getListView();
-        listView.setScrollingCacheEnabled(false); // TODO : Just save some
-                                                  // memory, check if needed
+        listView.setScrollingCacheEnabled(false);
         listView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
 
                 Intent intent = new Intent(ArticleListActivity.this,
                         ArticleDetailActivity.class);
-                intent.putExtra(ARTICLE_KEY, mArticleList.get(position));
+                intent.putExtra(ARTICLE_KEY, mArticleAdapter.getItem(position));
                 startActivity(intent);
             }
         });
