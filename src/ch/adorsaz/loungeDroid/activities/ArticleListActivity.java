@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,8 +33,10 @@ public class ArticleListActivity extends ListActivity {
 
     private ArticleAdapter mArticleAdapter = null;
     private ToDisplay mDisplayChoice = null;
+    private Article mArticleToDetail = null;
 
     protected static final String ARTICLE_KEY = "article";
+    protected static final String DISPLAYCHOICE_KEY = "mDisplayChoice";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,17 +45,30 @@ public class ArticleListActivity extends ListActivity {
         SharedPreferences pref = getSharedPreferences(
                 SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE);
 
-        if (pref.getString(SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
-                "ALWAYS_PROMPT").equals("ALWAYS_PROMPT")) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.displayMenu));
-            builder.setSingleChoiceItems(R.array.startdialog_human_toDisplay,
-                    R.array.startdialog_values_toDisplay, new DisplayDialogListener())
-                    .create().show();
+        mDisplayChoice = (ToDisplay) getIntent().getSerializableExtra(
+                DISPLAYCHOICE_KEY);
+
+        if (mDisplayChoice == null) {
+            if (pref.getString(SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
+                    "ALWAYS_PROMPT").equals("ALWAYS_PROMPT")) {
+                Log.d("ArticleList",
+                        "We display dialog box with mDisplayChoice : "
+                                + mDisplayChoice);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.displayMenu));
+                builder.setSingleChoiceItems(
+                        R.array.startdialog_human_toDisplay,
+                        R.array.startdialog_values_toDisplay,
+                        new DisplayDialogListener()).create().show();
+            } else {
+                mDisplayChoice = ToDisplay.valueOf(pref.getString(
+                        SettingsActivity.DISPLAY_BEHAVIOUR_PREF, "ALL"));
+
+                fetchNews();
+            }
         } else {
-            mDisplayChoice = ToDisplay.valueOf(pref.getString(
-                    SettingsActivity.DISPLAY_BEHAVIOUR_PREF, "ALL"));
-            fetchNews();
+            restoreAndUpdateData();
         }
     }
 
@@ -61,7 +77,10 @@ public class ArticleListActivity extends ListActivity {
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            mDisplayChoice = ToDisplay.values()[which];
+            mDisplayChoice = ToDisplay.values()[which + 1]; // We won't show
+                                                            // ALWAYS_PROMPT
+            Log.d("ArticleList", "have to show : " + mDisplayChoice
+                    + " (we selected " + which + ")");
             fetchNews();
             dialog.dismiss();
         }
@@ -70,51 +89,10 @@ public class ArticleListActivity extends ListActivity {
     @Override
     public void onPause() {
         super.onPause();
-        Intent intent = getIntent();
-        int adapterSize = mArticleAdapter.getCount();
-        intent.putExtra("mArticleAdapterSize", adapterSize);
-
-        for (int i = 0; i < adapterSize; i++) {
-            intent.putExtra("mArticleAdapterItem" + i,
-                    mArticleAdapter.getItem(i));
+        if (mArticleToDetail == null) {
+            saveData();
         }
-
-        finish();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Restore data
-        Intent intent = getIntent();
-        List<Article> articleList = new LinkedList<Article>();
-
-        int adapterSize = intent.getIntExtra("mArticleAdapterSize", 0);
-
-        for (int i = 0; i < adapterSize; i++) {
-            articleList.add((Article) intent
-                    .getParcelableExtra("mArticleAdapterItem" + i));
-        }
-
-        mArticleAdapter = new ArticleAdapter(getApplicationContext(),
-                R.layout.articlelist_item, R.id.articleItemTitle, articleList);
-
-        // Update one article if needed
-        Article articleUpdated = intent.getParcelableExtra(ARTICLE_KEY);
-
-        if (articleUpdated != null) {
-            for (int i = 0; i < mArticleAdapter.getCount(); i++) {
-                Article articleIterator = mArticleAdapter.getItem(i);
-                if (articleIterator.getId() == articleUpdated.getId()) {
-                    mArticleAdapter.remove(articleIterator);
-                    mArticleAdapter.insert(articleUpdated, i);
-                }
-            }
-        }
-
-        // Apply restored data
-        updateArticleAdapter();
+        //finish();
     }
 
     @Override
@@ -133,7 +111,6 @@ public class ArticleListActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.refresh:
                 fetchNews();
@@ -173,11 +150,8 @@ public class ArticleListActivity extends ListActivity {
         listView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
-
-                Intent intent = new Intent(ArticleListActivity.this,
-                        ArticleDetailActivity.class);
-                intent.putExtra(ARTICLE_KEY, mArticleAdapter.getItem(position));
-                startActivity(intent);
+                mArticleToDetail = mArticleAdapter.getItem(position);
+                saveData();
             }
         });
 
@@ -209,6 +183,8 @@ public class ArticleListActivity extends ListActivity {
                 case STARRED:
                     disableMenuItem(menu, R.id.showStarredMenu);
                     break;
+                case ALWAYS_PROMPT:
+                    break;
             }
         }
 
@@ -223,6 +199,85 @@ public class ArticleListActivity extends ListActivity {
     private void enableMenuItem(MenuItem menuItem) {
         menuItem.setVisible(true);
         menuItem.setEnabled(true);
+    }
+
+    private void saveData() {
+        Intent intent = null;
+
+        if (mArticleToDetail == null) {
+            intent = getIntent();
+        } else {
+            intent = new Intent(ArticleListActivity.this,
+                    ArticleDetailActivity.class);
+        }
+
+        if (mArticleAdapter != null) {
+            int adapterSize = mArticleAdapter.getCount();
+
+            intent.putExtra("mArticleAdapterSize", adapterSize);
+            intent.putExtra(DISPLAYCHOICE_KEY, mDisplayChoice);
+            intent.putExtra(ARTICLE_KEY, mArticleToDetail);
+
+            for (int i = 0; i < adapterSize; i++) {
+                intent.putExtra("mArticleAdapterItem" + i,
+                        mArticleAdapter.getItem(i));
+            }
+            Log.d("ArticleList", "Saved displaychoice : " + mDisplayChoice);
+        }
+
+        if (mArticleToDetail != null) {
+            startActivity(intent);
+        }
+    }
+
+    private void restoreAndUpdateData() {
+        // Restore data
+        Intent intent = getIntent();
+        List<Article> articleList = new LinkedList<Article>();
+
+        int adapterSize = intent.getIntExtra("mArticleAdapterSize", 0);
+
+        Log.d("ArticleList",
+                "Ok, we are restoring data and we have to display : "
+                        + mDisplayChoice + " and we've saved " + adapterSize
+                        + " articles.");
+
+        for (int i = 0; i < adapterSize; i++) {
+            articleList.add((Article) intent
+                    .getParcelableExtra("mArticleAdapterItem" + i));
+        }
+
+        mArticleAdapter = new ArticleAdapter(getApplicationContext(),
+                R.layout.articlelist_item, R.id.articleItemTitle, articleList);
+
+        // Update one article if needed
+        Article articleUpdated = intent.getParcelableExtra(ARTICLE_KEY);
+        Log.d("ArticleList", "and we have to update article : "
+                + articleUpdated.getId());
+
+        if (articleUpdated != null) {
+            for (int i = 0; i < mArticleAdapter.getCount(); i++) {
+                Article articleIterator = mArticleAdapter.getItem(i);
+                Log.d("ArticleList", "we iterate on article : "
+                        + articleIterator.getId() + " and we search : "
+                        + articleUpdated.getId());
+                int articleIteratorId = articleIterator.getId();
+                int articleUpdatedId = articleUpdated.getId();
+                if (articleIteratorId == articleUpdatedId) {
+                    Log.d("ArticleList", "article found and replaced : "
+                            + articleIterator.getId());
+                    mArticleAdapter.remove(articleIterator);
+                    mArticleAdapter.insert(articleUpdated, i);
+                    Log.d("ArticleList", "state of article is now : isRead : "
+                            + mArticleAdapter.getItem(i).isRead()
+                            + " and isStarred : "
+                            + mArticleAdapter.getItem(i).isStarred());
+                }
+            }
+        }
+
+        // Apply restored data
+        updateArticleAdapter();
     }
 
     private class ArticleAdapter extends ArrayAdapter<Article> {
