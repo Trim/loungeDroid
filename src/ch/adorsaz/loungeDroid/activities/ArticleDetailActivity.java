@@ -27,10 +27,13 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
     private Button mStarButton = null;
     private Button mBrowserButton = null;
 
+    private boolean isBackButtonPressed = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.articlelist_detail);
+
         mArticle = this.getIntent().getParcelableExtra(
                 ArticleListActivity.ARTICLE_KEY);
 
@@ -91,13 +94,24 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
     }
 
     @Override
+    public void onBackPressed() {
+        // Here you get Back Key Press So make boolean false
+        isBackButtonPressed = true;
+        super.onBackPressed();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
-        Intent intent = new Intent(ArticleDetailActivity.this,
-                ArticleListActivity.class);
-        intent.putExtra(ArticleListActivity.ARTICLE_KEY, mArticle);
-        startActivity(intent);
-        finish();
+        if (isBackButtonPressed) {
+            goBackToArticleList();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isBackButtonPressed = false;
     }
 
     public void updateReadButton() {
@@ -126,5 +140,16 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
             Toast.makeText(getApplicationContext(), "Unstarred.",
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void goBackToArticleList() {
+        Intent intent = new Intent(ArticleDetailActivity.this,
+                ArticleListActivity.class);
+
+        intent.putExtras(getIntent());
+        intent.putExtra(ArticleListActivity.ARTICLE_KEY, mArticle);
+
+        startActivity(intent);
+        finish();
     }
 }
