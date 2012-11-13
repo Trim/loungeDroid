@@ -90,12 +90,15 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
         }
     }
 
-    /*
-     * @Override public void onPause(){ Intent intent = new
-     * Intent(ArticleDetailActivity.this, ArticleListActivity.class);
-     * intent.putExtra(ArticleListActivity.ARTICLE_KEY, mArticle);
-     * startActivity(intent); }
-     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        Intent intent = new Intent(ArticleDetailActivity.this,
+                ArticleListActivity.class);
+        intent.putExtra(ArticleListActivity.ARTICLE_KEY, mArticle);
+        startActivity(intent);
+        finish();
+    }
 
     public void updateReadButton() {
         if (mArticle.isRead()) {
