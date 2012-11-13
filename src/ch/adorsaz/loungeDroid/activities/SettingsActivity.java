@@ -8,6 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -33,7 +34,7 @@ public class SettingsActivity extends PreferenceActivity {
         Log.d("Preferences",
                 "URL Server : " + pref.getString(URL_SERVER_PREF, ""));
 
-        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !mWantToEdit){
+        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !mWantToEdit) {
             Intent intent = new Intent(SettingsActivity.this,
                     ArticleListActivity.class);
             startActivity(intent);
@@ -44,9 +45,27 @@ public class SettingsActivity extends PreferenceActivity {
                     .edit();
             editor.remove(WANT_TO_EDIT_PREF);
             editor.commit();
-            mWantToEdit=false;
+            mWantToEdit = false;
 
             addPreferencesFromResource(R.xml.preferences);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        SharedPreferences pref = getSharedPreferences(SHARED_PREFERENCES,
+                Activity.MODE_PRIVATE);
+
+        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !mWantToEdit) {
+            Intent intent = new Intent(SettingsActivity.this,
+                    ArticleListActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "You should configure as least the server url to be able to use this application",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -54,6 +73,6 @@ public class SettingsActivity extends PreferenceActivity {
      * This method permit to alert this class that we want to edit preferences
      * */
     public static void setWantToEdit() {
-        mWantToEdit=true;
+        mWantToEdit = true;
     }
 }
