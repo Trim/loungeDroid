@@ -52,32 +52,46 @@ public class ArticleListGetter extends
 
         try {
             articles = getArticles(toDisplay[0]);
-        } catch (GetArticleListException e) {
-            // TODO Pass to offline mode
-            Log.e(SessionManager.LOG_SERVER,
-                    "Cannot get article list, are you correctly logged ? Remove cookie and try again. Using saved data if available.");
-            e.printStackTrace();
-
-            Editor editor = mActivity.getSharedPreferences(
-                    SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
-                    .edit();
-            editor.remove(SessionManager.SESSION_COOKIE_SETTINGS);
-            editor.commit();
-            articles = null;
         } catch (ParseArticleException e) {
             // TODO Make Toast
             Log.e(SessionManager.LOG_SERVER,
-                    "Cannot parse JSON response. Trying to display already parsed articles. Please contact developpers.");
+                    "Cannot parse JSON response when getting articles. Please contact developpers.");
             e.printStackTrace();
             articles = null;
         } catch (ConnectException e) {
             // TODO Pass to offline mode
             Log.e(SessionManager.LOG_SERVER,
-                    "There was an error with network connection. Removing cookie to try again later. Using saved data if available.");
+                    "There was an error with network connection.");
             setCookiePref(null);
             e.printStackTrace();
 
             articles = null;
+        } catch (GetArticleListException e) {
+            // Try again login and request.
+            SessionManager.deleteSessionCookie();
+
+            try {
+                articles = getArticles(toDisplay[0]);
+            } catch (ConnectException e1) {
+                // TODO Pass to offline mode
+                Log.e(SessionManager.LOG_SERVER,
+                        "There was an error with network connection.");
+                setCookiePref(null);
+                e1.printStackTrace();
+                articles = null;
+            } catch (ParseArticleException e1) {
+                // TODO Make Toast
+                Log.e(SessionManager.LOG_SERVER,
+                        "Cannot parse JSON response when getting articles. Please contact developpers.");
+                e1.printStackTrace();
+                articles = null;
+            } catch (GetArticleListException e1) {
+                // TODO Didn't resolved the error. Stop it.
+                Log.e(SessionManager.LOG_SERVER,
+                        "Cannot get article list, always bad response from server (twice tested).");
+                e1.printStackTrace();
+                articles = null;
+            }
         }
         return articles;
     }
@@ -91,7 +105,7 @@ public class ArticleListGetter extends
         } else {
             Toast.makeText(
                     mActivity,
-                    "Unable to get rss feeds. Have you network connection ? Are your settings correct ?",
+                    "Unable to get rss feeds. Please check your network and settings.",
                     Toast.LENGTH_LONG).show();
         }
     }

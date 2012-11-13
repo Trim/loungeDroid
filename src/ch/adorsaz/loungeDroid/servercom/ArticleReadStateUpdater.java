@@ -40,20 +40,31 @@ public class ArticleReadStateUpdater extends
     protected Article doInBackground(Article... article) {
         try {
             article[0] = updateArticle(article[0]);
-        } catch (ReadStateUpdateException e) {
-            // TODO Manage exception
-            Log.e(SessionManager.LOG_SERVER,
-                    "Error while updating. Try again later");
-            e.printStackTrace();
-
-            article[0] = null;
         } catch (ConnectException e) {
             // TODO Auto-generated catch block
             Log.e(SessionManager.LOG_SERVER,
-                    "There was an error with network connection. Removing cookie to try again later. Using saved data if available.");
+                    "There was an error with network connection.");
             e.printStackTrace();
 
             article[0] = null;
+        } catch (ReadStateUpdateException e) {
+            // Try again login and request.
+            SessionManager.deleteSessionCookie();
+
+            try {
+                article[0] = updateArticle(article[0]);
+            } catch (ConnectException e1) {
+                // TODO Auto-generated catch block
+                Log.e(SessionManager.LOG_SERVER,
+                        "There was an error with network connection.");
+                e1.printStackTrace();
+                article[0] = null;
+            } catch (ReadStateUpdateException e1) {
+                Log.e(SessionManager.LOG_SERVER,
+                        "Error while updating read state twice. Try again later");
+                e1.printStackTrace();
+                article[0] = null;
+            }
         }
 
         return article[0];

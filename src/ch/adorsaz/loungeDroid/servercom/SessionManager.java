@@ -70,6 +70,15 @@ public class SessionManager {
         return doRequest(pageUrl, httpParameters);
     }
 
+    static protected void deleteSessionCookie() {
+        mSessionCookie = null;
+        Editor editor = mApplicationContext.getSharedPreferences(
+                SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
+                .edit();
+        editor.remove(SessionManager.SESSION_COOKIE_SETTINGS);
+        editor.commit();
+    }
+
     private void loginLounge() throws ConnectException {
         try {
             String urlParameters = LOGIN_GET_RSSLOUNGE + "="

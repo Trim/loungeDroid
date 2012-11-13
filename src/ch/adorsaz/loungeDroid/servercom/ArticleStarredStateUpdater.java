@@ -40,19 +40,31 @@ public class ArticleStarredStateUpdater extends
     protected Article doInBackground(Article... article) {
         try {
             article[0] = updateArticle(article[0]);
-        } catch (StarredStateUpdateException e) {
-            Log.e(SessionManager.LOG_SERVER,
-                    "Error while updating starred state. Try again later.");
-            e.printStackTrace();
-
-            article[0] = null;
         } catch (ConnectException e) {
             // TODO Auto-generated catch block
             Log.e(SessionManager.LOG_SERVER,
-                    "There was an error with network connection. Removing cookie to try again later. Using saved data if available.");
+                    "There was an error with network connection.");
             e.printStackTrace();
 
             article[0] = null;
+        } catch (StarredStateUpdateException e) {
+            // Try again login and request.
+            SessionManager.deleteSessionCookie();
+
+            try {
+                article[0] = updateArticle(article[0]);
+            } catch (ConnectException e1) {
+                // TODO Auto-generated catch block
+                Log.e(SessionManager.LOG_SERVER,
+                        "There was an error with network connection.");
+                e1.printStackTrace();
+                article[0] = null;
+            } catch (StarredStateUpdateException e1) {
+                Log.e(SessionManager.LOG_SERVER,
+                        "Error while updating starred state twice. Try again later.");
+                e1.printStackTrace();
+                article[0] = null;
+            }
         }
 
         return article[0];
@@ -66,7 +78,7 @@ public class ArticleStarredStateUpdater extends
         } else {
             Toast.makeText(
                     mActivity,
-                    "Unable to update rss feed. Have you network connection ? Are your settings correct ?",
+                    "Unable to update starred state for an article. Please check your network and settings.",
                     Toast.LENGTH_LONG).show();
         }
     }
