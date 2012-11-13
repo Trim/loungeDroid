@@ -1,6 +1,15 @@
 package ch.adorsaz.loungeDroid.exception;
 
+/**
+ * StartredSateUpdateException is sent when application is unable to update the
+ * starred state of one article.
+ * */
 public class StarredStateUpdateException extends Exception {
+
+    /**
+     * Auto-generated ID by Eclpipse.
+     */
+    private static final long serialVersionUID = -7137335428363481542L;
 
     @Override
     public String getMessage() {

@@ -29,6 +29,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+/**
+ * ArticleListActivity tasks is to get all articles from server (taking account
+ * of user preference, to get all, only unread or only starred articles).
+ * */
 public class ArticleListActivity extends ListActivity {
 
     private ArticleAdapter mArticleAdapter = null;
@@ -72,6 +76,10 @@ public class ArticleListActivity extends ListActivity {
         }
     }
 
+    /**
+     * DisplayDialogListener is only used if user asked to prompt it which
+     * articles he want to see.
+     * */
     private class DisplayDialogListener implements
             DialogInterface.OnClickListener {
 
@@ -86,6 +94,10 @@ public class ArticleListActivity extends ListActivity {
         }
     }
 
+    /**
+     * onPause() have to save data to be able to avoid reload always data from
+     * server.
+     * */
     @Override
     public void onPause() {
         super.onPause();
@@ -138,12 +150,24 @@ public class ArticleListActivity extends ListActivity {
         return false;
     }
 
+    /**
+     * updateArticleList should be used by AsyncTask (especially
+     * loungeDroid.server.ArticleListGetter) to update data on this activity.
+     * 
+     * @param articleList
+     *            List of articles to display in the activity (will replace all
+     *            already displayed articles)
+     * */
     public void updateArticleList(List<Article> articleList) {
         mArticleAdapter = new ArticleAdapter(getApplicationContext(),
                 R.layout.articlelist_item, R.id.articleItemTitle, articleList);
         updateArticleAdapter();
     }
 
+    /**
+     * updateArticleAdapter updates really the displayed articles with his
+     * latest ArticleAdapter field version.
+     * */
     private void updateArticleAdapter() {
         ListView listView = getListView();
         listView.setScrollingCacheEnabled(false);
@@ -158,6 +182,10 @@ public class ArticleListActivity extends ListActivity {
         setListAdapter(mArticleAdapter);
     }
 
+    /**
+     * fetchNews() is an async task that will get news depending on user
+     * preferences.
+     * */
     private void fetchNews() {
         ArticleListGetter getter = new ArticleListGetter(this);
         getter.execute(mDisplayChoice);
@@ -190,6 +218,15 @@ public class ArticleListActivity extends ListActivity {
 
     }
 
+    /**
+     * disableMenuItem will disable the item with depending on his id and in
+     * which menu is it.
+     * 
+     * @param menu
+     *            Menu where to disable some menu item.
+     * @param id
+     *            Id of the menuItem to disable.
+     * */
     private void disableMenuItem(Menu menu, int id) {
         MenuItem menuItem = menu.findItem(id);
         menuItem.setVisible(false);
@@ -201,6 +238,10 @@ public class ArticleListActivity extends ListActivity {
         menuItem.setEnabled(true);
     }
 
+    /**
+     * saveData will save already downloaded data to avoid too many http request
+     * (especially on resume).
+     * */
     private void saveData() {
         Intent intent = null;
 
@@ -230,6 +271,13 @@ public class ArticleListActivity extends ListActivity {
         }
     }
 
+    /**
+     * restoreAndUpdateData restores data saved in some Intent and update a
+     * modified article (which is also in Intent with special key).
+     * 
+     * This function is used when resume from ArticleDetailActivity because this
+     * activity is able to update article states (read state and starred state).
+     * */
     private void restoreAndUpdateData() {
         // Restore data
         Intent intent = getIntent();
@@ -280,6 +328,9 @@ public class ArticleListActivity extends ListActivity {
         updateArticleAdapter();
     }
 
+    /**
+     * ArticleAdapter is the specific ArrayAdapter for this ArticleListActivity.
+     * */
     private class ArticleAdapter extends ArrayAdapter<Article> {
         private Context mContext;
         private List<Article> mArticles;

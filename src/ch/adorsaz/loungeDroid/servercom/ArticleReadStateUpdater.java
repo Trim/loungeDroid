@@ -12,6 +12,10 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * ArticleStarredStateUpdate is an async task to update read state of one
+ * article and update ArticleDetailActivity.
+ * */
 public class ArticleReadStateUpdater extends
         AsyncTask<Article, Object, Article> {
     private SessionManager mSessionManager = null;

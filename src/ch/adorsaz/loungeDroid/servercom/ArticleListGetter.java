@@ -21,12 +21,16 @@ import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * ArticleListGetter is an async task which will get all articles on server,
+ * store it using own Article type and update ArticleListActivity data.
+ * */
 public class ArticleListGetter extends
         AsyncTask<ToDisplay, Object, List<Article>> {
     private SessionManager mSessionManager = null;
     private ArticleListActivity mActivity = null;
 
-    /* Some urls needed to get feeds */
+    /* Some urls needed to get specific articles */
     private final static String ARTICLELIST_PAGE_RSSLOUNGE = "/item/list";
     private final static String DISPLAY_ALL_PARAMS = "unread=0&starred=0";
     private final static String DISPLAY_UNREAD_PARAMS = "unread=1&starred=0";

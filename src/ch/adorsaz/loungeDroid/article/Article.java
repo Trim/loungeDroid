@@ -3,6 +3,12 @@ package ch.adorsaz.loungeDroid.article;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Article is the type which implements all data received from the server for
+ * one article.
+ * 
+ * This implements Parcelable to be able to pass it in android Intents.
+ * */
 public class Article implements Parcelable {
     private Integer mId;
     private Integer mDay;

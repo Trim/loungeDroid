@@ -10,6 +10,11 @@ import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * SettingsActivity prompt user to get his preferences. It's also the first
+ * activity to be launched to be able to verify that settings are good (need a
+ * server url).
+ * */
 public class SettingsActivity extends PreferenceActivity {
 
     /* Preference constants */

@@ -25,6 +25,10 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * SessionManager is the class which manage connection with server, check if
+ * always logged and execute a request.
+ * */
 public class SessionManager {
     private static String mLogin = null;
     private static String mPassword = null;
@@ -55,6 +59,15 @@ public class SessionManager {
         }
 
         return mSessionManager;
+    }
+
+    protected JSONObject serverRequest(String pageUrl, String httpParameters)
+        throws ConnectException {
+        if (mSessionCookie == null || mSessionCookie.length() == 0) {
+            loginLounge();
+        }
+
+        return doRequest(pageUrl, httpParameters);
     }
 
     private void loginLounge() throws ConnectException {
@@ -206,14 +219,5 @@ public class SessionManager {
 
         Intent intent = new Intent(mApplicationContext, SettingsActivity.class);
         mApplicationContext.startActivity(intent);
-    }
-
-    protected JSONObject serverRequest(String pageUrl, String httpParameters)
-        throws ConnectException {
-        if (mSessionCookie == null || mSessionCookie.length() == 0) {
-            loginLounge();
-        }
-
-        return doRequest(pageUrl, httpParameters);
     }
 }

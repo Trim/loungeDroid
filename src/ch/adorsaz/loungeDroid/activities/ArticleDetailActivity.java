@@ -16,6 +16,11 @@ import android.widget.Toast;
 import android.app.Activity;
 import android.content.Intent;
 
+/**
+ * ArticleDetailActivity display all needed informations from one Article in one
+ * Activity. It can update read state, starred state and can call WebBrowser to
+ * show article in his context.
+ * */
 public class ArticleDetailActivity extends Activity implements OnClickListener {
 
     private Article mArticle = null;
