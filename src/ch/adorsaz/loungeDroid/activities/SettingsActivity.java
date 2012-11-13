@@ -18,22 +18,23 @@ public class SettingsActivity extends PreferenceActivity {
     public static final String DISPLAY_BEHAVIOUR_PREF = "todisplay_pref";
     public static final String USER_SERVER_PREF = "username_server_pref";
     public static final String PASSWORD_SERVER_PREF = "password_server_pref";
-    
+
     public static final String WANT_TO_EDIT_PREF = "want_to_edit_pref";
+    private static boolean mWantToEdit = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);        
+        super.onCreate(savedInstanceState);
         getPreferenceManager().setSharedPreferencesName(SHARED_PREFERENCES);
         getPreferenceManager().setSharedPreferencesMode(Activity.MODE_PRIVATE);
-        
+
         SharedPreferences pref = getSharedPreferences(SHARED_PREFERENCES,
                 Activity.MODE_PRIVATE);
 
         Log.d("Preferences",
                 "URL Server : " + pref.getString(URL_SERVER_PREF, ""));
 
-        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !pref.getBoolean(WANT_TO_EDIT_PREF, false)) {
+        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !mWantToEdit){
             Intent intent = new Intent(SettingsActivity.this,
                     ArticleListActivity.class);
             startActivity(intent);
@@ -44,8 +45,16 @@ public class SettingsActivity extends PreferenceActivity {
                     .edit();
             editor.remove(WANT_TO_EDIT_PREF);
             editor.commit();
-            
+            mWantToEdit=false;
+
             addPreferencesFromResource(R.xml.preferences);
         }
+    }
+
+    /**
+     * This method permit to alert this class that we want to edit preferences
+     * */
+    public static void setWantToEdit() {
+        mWantToEdit=true;
     }
 }

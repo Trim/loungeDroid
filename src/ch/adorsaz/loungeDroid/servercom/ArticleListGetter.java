@@ -12,7 +12,6 @@ import ch.adorsaz.loungeDroid.activities.ArticleListActivity;
 import ch.adorsaz.loungeDroid.activities.SettingsActivity;
 import ch.adorsaz.loungeDroid.article.Article;
 import ch.adorsaz.loungeDroid.article.ToDisplay;
-import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 import ch.adorsaz.loungeDroid.exception.GetArticleListException;
 import ch.adorsaz.loungeDroid.exception.ParseArticleException;
 import android.app.Activity;
@@ -28,7 +27,7 @@ public class ArticleListGetter extends
     private ArticleListActivity mActivity = null;
 
     /* Some urls needed to get feeds */
-    private final static String ARTICLES_PAGE_RSSLOUNGE = "/item/list";
+    private final static String ARTICLELIST_PAGE_RSSLOUNGE = "/item/list";
     private final static String DISPLAY_ALL_PARAMS = "unread=0&starred=0";
     private final static String DISPLAY_UNREAD_PARAMS = "unread=1&starred=0";
     private final static String DISPLAY_STARRED_PARAMS = "unread=0&starred=1";
@@ -39,8 +38,8 @@ public class ArticleListGetter extends
 
     @Override
     protected void onPreExecute() {
-        mSessionManager = SessionManager.getInstance(mActivity
-                .getApplicationContext());
+        mSessionManager = SessionManager.getInstance(mActivity);
+        mActivity.setProgressBarVisibility(true);
     }
 
     @Override
@@ -49,14 +48,9 @@ public class ArticleListGetter extends
 
         try {
             articles = getArticles(toDisplay[0]);
-        } catch (AuthenticationFailLoungeException e) {
-            // TODO Pass to offline mode
-            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
-                    "Cannot log in. Check your connection. We'll check if we have saved data before.");
-            articles = null;
         } catch (GetArticleListException e) {
             // TODO Pass to offline mode
-            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
+            Log.e(SessionManager.LOG_SERVER,
                     "Cannot get article list, are you correctly logged ? Remove cookie and try again. Using saved data if available.");
             Editor editor = mActivity.getSharedPreferences(
                     SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
@@ -66,18 +60,17 @@ public class ArticleListGetter extends
             articles = null;
         } catch (ParseArticleException e) {
             // TODO Make Toast
-            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
+            Log.e(SessionManager.LOG_SERVER,
                     "Cannot parse JSON response. Trying to display already parsed articles. Please contact developpers.");
+            e.printStackTrace();
             articles = null;
         } catch (ConnectException e) {
             // TODO Pass to offline mode
-            Log.e(SessionManager.LOG_DEBUG_LOUNGE,
-                    "There were an error with network connection. Remove cookie and try again. Using saved data if available.");
-            Editor editor = mActivity.getSharedPreferences(
-                    SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
-                    .edit();
-            editor.remove(SessionManager.SESSION_COOKIE_SETTINGS);
-            editor.commit();
+            Log.e(SessionManager.LOG_SERVER,
+                    "There was an error with network connection. Removing cookie to try again later. Using saved data if available.");
+            setCookiePref(null);
+            e.printStackTrace();
+
             articles = null;
         }
         return articles;
@@ -85,21 +78,22 @@ public class ArticleListGetter extends
 
     @Override
     protected void onPostExecute(List<Article> allArticles) {
+        mActivity.setProgressBarVisibility(false);
         if (allArticles != null) {
             mActivity.updateArticleList(allArticles);
-            Log.d("loungeDroid", "Finish to update Activity");
+            Log.d(SessionManager.LOG_SERVER, "Finish to update Activity");
         } else {
             Toast.makeText(
                     mActivity,
-                    "There were errors on log in. Please check your settings and refresh.",
+                    "Unable to get rss feeds. Have you network connection ? Are your settings correct ?",
                     Toast.LENGTH_LONG).show();
         }
     }
 
     private List<Article> getArticles(ToDisplay toDisplay)
         throws GetArticleListException,
-        AuthenticationFailLoungeException,
-        ParseArticleException, ConnectException {
+        ParseArticleException,
+        ConnectException {
         List<Article> articleList = new LinkedList<Article>();
         JSONArray messages = null;
 
@@ -116,11 +110,13 @@ public class ArticleListGetter extends
                 break;
         }
         JSONObject jsonResponse = mSessionManager.serverRequest(
-                ARTICLES_PAGE_RSSLOUNGE, httpParams);
+                ARTICLELIST_PAGE_RSSLOUNGE, httpParams);
 
         try {
             messages = jsonResponse.getJSONArray("messages");
         } catch (JSONException e) {
+            throw new GetArticleListException();
+        } catch (NullPointerException e) {
             throw new GetArticleListException();
         }
 
@@ -150,5 +146,13 @@ public class ArticleListGetter extends
             throw new ParseArticleException();
         }
         return articleList;
+    }
+
+    private void setCookiePref(String cookie) {
+        Editor editor = mActivity.getSharedPreferences(
+                SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
+                .edit();
+        editor.putString(SessionManager.SESSION_COOKIE_SETTINGS, cookie);
+        editor.commit();
     }
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.adorsaz.loungeDroid.activities.SettingsActivity;
-import ch.adorsaz.loungeDroid.exception.AuthenticationFailLoungeException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -38,9 +38,14 @@ public class SessionManager {
     private final static String PASSWORD_GET_RSSLOUNGE = "password";
     protected final static String JSON_GET_RSSLOUNGE = "json=true";
 
+    protected static final String SESSION_COOKIE_NAME = "PHPSESSID";
     protected static final String SESSION_COOKIE_SETTINGS = "session_cookie_settings";
 
-    protected final static String LOG_DEBUG_LOUNGE = "loungeDroid.server :";
+    protected final static String LOG_SERVER = "loungeDroid.server";
+    protected final static String BAD_LOGIN_ERROR = "Authentication failed : bad login and/or password.";
+    protected final static String MALFORMED_URL = "There's a typo in url. Please check url : ";
+    protected final static String NO_RESPONSE_SERVER_ERROR = "No server response. Check your settings.";
+    protected final static String UNEXPECTED_RESPONSE_ERROR = "There was a bug while connecting to server, please report it : ";
 
     public final static SessionManager getInstance(Context context) {
         if (mSessionManager == null) {
@@ -52,7 +57,7 @@ public class SessionManager {
         return mSessionManager;
     }
 
-    private void loginLounge() throws AuthenticationFailLoungeException {
+    private void loginLounge() throws ConnectException {
         try {
             String urlParameters = LOGIN_GET_RSSLOUNGE + "="
                     + URLEncoder.encode(mLogin, "UTF-8") + "&"
@@ -64,28 +69,22 @@ public class SessionManager {
                     urlParameters);
             if (jsonResponse != null) {
                 if (jsonResponse.getBoolean("success") == true) {
-                    Log.d(LOG_DEBUG_LOUNGE, "Logged to the server.");
+                    Log.d(LOG_SERVER, "Logged to the server.");
                     setCookiePref(mSessionCookie);
                 } else {
-                    throw new AuthenticationFailLoungeException();
+                    errorDisplayAndSettings(BAD_LOGIN_ERROR);
+                    setCookiePref(null);
+                    throw new ConnectException(BAD_LOGIN_ERROR);
                 }
             } else {
-                throw new AuthenticationFailLoungeException();
-            }
-        } catch (AuthenticationFailLoungeException e) {
-            if (mSessionCookie == null) {
-                throw new AuthenticationFailLoungeException();
-            } else {
-                mSessionCookie = null;
-                setCookiePref(null);
-                loginLounge();
+                throw new ConnectException(NO_RESPONSE_SERVER_ERROR);
             }
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
+                    + " unsupported encoding exception.");
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
+                    + " server didn't response success on login.");
         }
     }
 
@@ -130,10 +129,11 @@ public class SessionManager {
     }
 
     private synchronized JSONObject doRequest(String pageUrl,
-            String httpParameters) {
+            String httpParameters) throws ConnectException {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
 
+        Log.d(LOG_SERVER, "Try to connect with cookie : " + mSessionCookie);
         try {
             urlConnection = (HttpURLConnection) new URL(mServerUrl + pageUrl)
                     .openConnection();
@@ -152,7 +152,13 @@ public class SessionManager {
 
             if (urlConnection.getResponseCode() == 200) {
                 if (urlConnection.getHeaderField("Set-Cookie") != null) {
-                    mSessionCookie = urlConnection.getHeaderField("Set-Cookie");
+                    String cookie = urlConnection.getHeaderField("Set-Cookie");
+                    if (cookie.startsWith(SESSION_COOKIE_NAME)) {
+                        mSessionCookie = SESSION_COOKIE_NAME
+                                + cookie.substring(cookie.indexOf('='),
+                                        cookie.indexOf(';') + 1);
+                        Log.d(LOG_SERVER, "Received cookie : " + mSessionCookie);
+                    }
                 }
 
                 InputStream responseInput = urlConnection.getInputStream();
@@ -161,20 +167,15 @@ public class SessionManager {
             }
 
         } catch (MalformedURLException e) {
-            Log.e(LOG_DEBUG_LOUNGE, "Malformed url : " + mServerUrl);
-
-            Toast.makeText(mApplicationContext,
-                    "There's a typo in server url.\nPlease check it.",
-                    Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(mApplicationContext,
-                    SettingsActivity.class);
-            mApplicationContext.startActivity(intent);
+            errorDisplayAndSettings(MALFORMED_URL + pageUrl);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
+                    + " input/output exception for page request : " + pageUrl);
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ConnectException(
+                    UNEXPECTED_RESPONSE_ERROR
+                            + " unable to read json response correctly for page request "
+                            + pageUrl);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -182,8 +183,8 @@ public class SessionManager {
         }
 
         if (jsonResponse == null) {
-            Log.e(LOG_DEBUG_LOUNGE,
-                    "jsonResponse is null ! Cannot access page " + pageUrl);
+            Log.e(LOG_SERVER, "jsonResponse is null ! Cannot access page "
+                    + pageUrl);
         }
         return jsonResponse;
     }
@@ -192,12 +193,23 @@ public class SessionManager {
         Editor editor = mApplicationContext.getSharedPreferences(
                 SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
                 .edit();
-        editor.putString(SESSION_COOKIE_SETTINGS, mSessionCookie);
+        editor.putString(SESSION_COOKIE_SETTINGS, cookie);
+        mSessionCookie = cookie;
         editor.commit();
     }
 
+    private void errorDisplayAndSettings(String message) {
+        Log.e(LOG_SERVER, message);
+        Toast.makeText(mApplicationContext, message, Toast.LENGTH_LONG).show();
+
+        SettingsActivity.setWantToEdit();
+
+        Intent intent = new Intent(mApplicationContext, SettingsActivity.class);
+        mApplicationContext.startActivity(intent);
+    }
+
     protected JSONObject serverRequest(String pageUrl, String httpParameters)
-        throws AuthenticationFailLoungeException {
+        throws ConnectException {
         if (mSessionCookie == null || mSessionCookie.length() == 0) {
             loginLounge();
         }
