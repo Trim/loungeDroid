@@ -120,11 +120,7 @@ public class ArticleListActivity extends ListActivity {
                 fetchNews();
                 break;
             case R.id.menu_settings:
-                Editor editor = getSharedPreferences(
-                        SettingsActivity.SHARED_PREFERENCES,
-                        Activity.MODE_PRIVATE).edit();
-                editor.putBoolean(SettingsActivity.WANT_TO_EDIT_PREF, true);
-                editor.commit();
+                SettingsActivity.setWantToEdit();
 
                 Intent intent;
                 intent = new Intent(this, SettingsActivity.class);
