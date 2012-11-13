@@ -103,6 +103,8 @@ public class ArticleListActivity extends ListActivity {
         super.onPause();
         if (mArticleToDetail == null) {
             saveData();
+        } else {
+            finish();
         }
     }
 
