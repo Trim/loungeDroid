@@ -104,7 +104,6 @@ public class ArticleListActivity extends ListActivity {
         if (mArticleToDetail == null) {
             saveData();
         }
-        //finish();
     }
 
     @Override
@@ -300,26 +299,16 @@ public class ArticleListActivity extends ListActivity {
 
         // Update one article if needed
         Article articleUpdated = intent.getParcelableExtra(ARTICLE_KEY);
-        Log.d("ArticleList", "and we have to update article : "
-                + articleUpdated.getId());
 
         if (articleUpdated != null) {
             for (int i = 0; i < mArticleAdapter.getCount(); i++) {
                 Article articleIterator = mArticleAdapter.getItem(i);
-                Log.d("ArticleList", "we iterate on article : "
-                        + articleIterator.getId() + " and we search : "
-                        + articleUpdated.getId());
+
                 int articleIteratorId = articleIterator.getId();
                 int articleUpdatedId = articleUpdated.getId();
                 if (articleIteratorId == articleUpdatedId) {
-                    Log.d("ArticleList", "article found and replaced : "
-                            + articleIterator.getId());
                     mArticleAdapter.remove(articleIterator);
                     mArticleAdapter.insert(articleUpdated, i);
-                    Log.d("ArticleList", "state of article is now : isRead : "
-                            + mArticleAdapter.getItem(i).isRead()
-                            + " and isStarred : "
-                            + mArticleAdapter.getItem(i).isStarred());
                 }
             }
         }
