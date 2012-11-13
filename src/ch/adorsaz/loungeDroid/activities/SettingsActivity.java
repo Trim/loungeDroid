@@ -1,7 +1,6 @@
 package ch.adorsaz.loungeDroid.activities;
 
 import ch.adorsaz.loungeDroid.R;
-import ch.adorsaz.loungeDroid.servercom.SessionManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
