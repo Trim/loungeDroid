@@ -235,10 +235,19 @@ public class ArticleListActivity extends ListActivity {
 
                     if (articleItemTitle != null && articleItemAuthor != null
                             && articleItemDate != null) {
-                        String title = "";
                         if (!article.isRead()) {
-                            title = "* ";
+                            articleItem.setBackgroundColor(getResources()
+                                    .getColor(R.color.isUnRead));
+                        } else {
+                            articleItem.setBackgroundColor(getResources()
+                                    .getColor(R.color.isRead));
                         }
+
+                        String title = "";
+                        if (article.isStarred()) {
+                            title += "\u2605 ";
+                        }
+
                         title += article.getSubject();
 
                         articleItemTitle.setText(title);
