@@ -52,6 +52,8 @@ public class ArticleListGetter extends
             // TODO Pass to offline mode
             Log.e(SessionManager.LOG_SERVER,
                     "Cannot get article list, are you correctly logged ? Remove cookie and try again. Using saved data if available.");
+            e.printStackTrace();
+
             Editor editor = mActivity.getSharedPreferences(
                     SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
                     .edit();
@@ -107,6 +109,8 @@ public class ArticleListGetter extends
                 break;
             case STARRED:
                 httpParams += "&" + DISPLAY_STARRED_PARAMS;
+                break;
+            case ALWAYS_PROMPT:
                 break;
         }
         JSONObject jsonResponse = mSessionManager.serverRequest(
