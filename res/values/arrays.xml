@@ -4,8 +4,8 @@
     <string-array name="pref_human_toDisplay">
         <item>Always prompt</item>
         <item>Show all articles</item>
-        <item>Show unread articles</item>
-        <item>Show starred articles</item>
+        <item>Show only unread</item>
+        <item>Show only starred</item>
     </string-array>
     <string-array name="pref_values_toDisplay">
         <item>ALWAYS_PROMPT</item>
@@ -17,8 +17,8 @@
     <!-- Dialog interface if "Always prompt" selected in preferences -->
     <string-array name="startdialog_human_toDisplay">
         <item>Show all articles</item>
-        <item>Show unread articles</item>
-        <item>Show starred articles</item>
+        <item>Show only unread</item>
+        <item>Show only starred</item>
     </string-array>
     <string-array name="startdialog_values_toDisplay">
         <item>ALL</item>
