@@ -7,6 +7,7 @@ import ch.adorsaz.loungeDroid.R;
 import ch.adorsaz.loungeDroid.article.ToDisplay;
 import ch.adorsaz.loungeDroid.article.Article;
 import ch.adorsaz.loungeDroid.servercom.ArticleListGetter;
+import ch.adorsaz.loungeDroid.servercom.ArticleMarkAllRead;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -140,6 +141,9 @@ public class ArticleListActivity extends ListActivity {
                 mDisplayChoice = ToDisplay.STARRED;
                 fetchNews();
                 break;
+            case R.id.markAllRead:
+                markAllRead();
+                break;
             case R.id.menu_settings:
                 SettingsActivity.setWantToEdit();
 
@@ -190,6 +194,23 @@ public class ArticleListActivity extends ListActivity {
     private void fetchNews() {
         ArticleListGetter getter = new ArticleListGetter(this);
         getter.execute(mDisplayChoice);
+    }
+
+    private void markAllRead() {
+        if (mArticleAdapter != null) {
+            ArticleMarkAllRead allMarker = new ArticleMarkAllRead(this);
+
+            List<Integer> articleIdList = new LinkedList<Integer>();
+            for (int articleIterator = 0; articleIterator < mArticleAdapter
+                    .getCount(); articleIterator++) {
+                Article oneArticle = mArticleAdapter.getItem(articleIterator);
+                if (!oneArticle.isRead()) {
+                    articleIdList.add(oneArticle.getId());
+                }
+            }
+            
+            allMarker.execute(articleIdList);
+        }
     }
 
     private void disableToDisplayMenu(Menu menu) {
