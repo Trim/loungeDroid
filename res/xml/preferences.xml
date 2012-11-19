@@ -4,24 +4,26 @@
     <PreferenceCategory android:title="@string/pref_server_category" >
         <EditTextPreference
             android:key="url_server_pref"
-            android:title="@string/pref_server_url"
-            android:defaultValue="" />
+            android:singleLine="true"
+            android:summary="http(s)://www.example.org/rsslounge"
+            android:title="@string/pref_server_url" />
         <EditTextPreference
             android:key="username_server_pref"
+            android:singleLine="true"
             android:title="@string/pref_server_username" />
         <EditTextPreference
+            android:inputType="textPassword"
             android:key="password_server_pref"
-            android:title="@string/pref_server_password"
-            android:inputType="textPassword" />
+            android:singleLine="true"
+            android:title="@string/pref_server_password" />
     </PreferenceCategory>
-    
     <PreferenceCategory android:title="@string/pref_behaviour_category" >
-       <ListPreference 
-           android:key="todisplay_pref"
-           android:title="@string/pref_behaviour_todisplay"
-           android:entries="@array/pref_human_toDisplay"
-           android:entryValues="@array/pref_values_toDisplay"
-           android:defaultValue="0"/>
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_human_toDisplay"
+            android:entryValues="@array/pref_values_toDisplay"
+            android:key="todisplay_pref"
+            android:title="@string/pref_behaviour_todisplay" />
     </PreferenceCategory>
 
 </PreferenceScreen>
