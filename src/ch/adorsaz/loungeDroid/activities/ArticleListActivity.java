@@ -36,22 +36,38 @@ import android.widget.TextView;
  * */
 public class ArticleListActivity extends ListActivity {
 
+    /**
+     * The adapter to show in the list activity.
+     * */
     private ArticleAdapter mArticleAdapter = null;
+    /**
+     * The selection of articles to display.
+     * */
     private ToDisplay mDisplayChoice = null;
+    /**
+     * The article that user want to see details.
+     * */
     private Article mArticleToDetail = null;
 
+    /**
+     * The key to save and find article in the intent.
+     * */
     protected static final String ARTICLE_KEY = "article";
+    /**
+     * The key to remember which was the displaying choice of the user.
+     * */
     protected static final String DISPLAYCHOICE_KEY = "mDisplayChoice";
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences pref = getSharedPreferences(
-                SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE);
+        SharedPreferences pref =
+                getSharedPreferences(SettingsActivity.SHARED_PREFERENCES,
+                        Activity.MODE_PRIVATE);
 
-        mDisplayChoice = (ToDisplay) getIntent().getSerializableExtra(
-                DISPLAYCHOICE_KEY);
+        mDisplayChoice =
+                (ToDisplay) getIntent().getSerializableExtra(DISPLAYCHOICE_KEY);
 
         if (mDisplayChoice == null) {
             if (pref.getString(SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
@@ -67,8 +83,13 @@ public class ArticleListActivity extends ListActivity {
                         R.array.startdialog_values_toDisplay,
                         new DisplayDialogListener()).create().show();
             } else {
-                mDisplayChoice = ToDisplay.valueOf(pref.getString(
-                        SettingsActivity.DISPLAY_BEHAVIOUR_PREF, "ALL"));
+                mDisplayChoice =
+                        ToDisplay
+                                .valueOf(pref
+                                        .getString(
+                                                SettingsActivity
+                                                .DISPLAY_BEHAVIOUR_PREF,
+                                                "ALL"));
 
                 fetchNews();
             }
@@ -85,7 +106,7 @@ public class ArticleListActivity extends ListActivity {
             DialogInterface.OnClickListener {
 
         @Override
-        public void onClick(DialogInterface dialog, int which) {
+        public void onClick(final DialogInterface dialog, final int which) {
             mDisplayChoice = ToDisplay.values()[which + 1]; // We won't show
                                                             // ALWAYS_PROMPT
             Log.d("ArticleList", "have to show : " + mDisplayChoice
@@ -100,7 +121,7 @@ public class ArticleListActivity extends ListActivity {
      * server.
      * */
     @Override
-    public void onPause() {
+    public final void onPause() {
         super.onPause();
         if (mArticleToDetail == null) {
             saveData();
@@ -110,7 +131,7 @@ public class ArticleListActivity extends ListActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public final boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_article_list, menu);
         disableToDisplayMenu(menu);
@@ -118,13 +139,13 @@ public class ArticleListActivity extends ListActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public final boolean onPrepareOptionsMenu(final Menu menu) {
         disableToDisplayMenu(menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public final boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
                 fetchNews();
@@ -151,6 +172,8 @@ public class ArticleListActivity extends ListActivity {
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
+            default:
+                break;
         }
         return false;
     }
@@ -158,14 +181,14 @@ public class ArticleListActivity extends ListActivity {
     /**
      * updateArticleList should be used by AsyncTask (especially
      * loungeDroid.server.ArticleListGetter) to update data on this activity.
-     * 
-     * @param articleList
-     *            List of articles to display in the activity (will replace all
-     *            already displayed articles)
+     * @param articleList List of articles to display in the activity (will
+     *            replace all already displayed articles)
      * */
-    public void updateArticleList(List<Article> articleList) {
-        mArticleAdapter = new ArticleAdapter(getApplicationContext(),
-                R.layout.articlelist_item, R.id.articleItemTitle, articleList);
+    public final void updateArticleList(final List<Article> articleList) {
+        mArticleAdapter =
+                new ArticleAdapter(getApplicationContext(),
+                        R.layout.articlelist_item, R.id.articleItemTitle,
+                        articleList);
         updateArticleAdapter();
     }
 
@@ -177,8 +200,8 @@ public class ArticleListActivity extends ListActivity {
         ListView listView = getListView();
         listView.setScrollingCacheEnabled(false);
         listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
+            public void onItemClick(final AdapterView<?> parent,
+                    final View view, final int position, final long id) {
                 mArticleToDetail = mArticleAdapter.getItem(position);
                 saveData();
             }
@@ -196,6 +219,9 @@ public class ArticleListActivity extends ListActivity {
         getter.execute(mDisplayChoice);
     }
 
+    /**
+     * Ask to server to mark all actual articles to read state.
+     * */
     private void markAllRead() {
         if (mArticleAdapter != null) {
             ArticleMarkAllRead allMarker = new ArticleMarkAllRead(this);
@@ -208,12 +234,17 @@ public class ArticleListActivity extends ListActivity {
                     articleIdList.add(oneArticle.getId());
                 }
             }
-            
+
             allMarker.execute(articleIdList);
         }
     }
 
-    private void disableToDisplayMenu(Menu menu) {
+    /**
+     * Disable item in to display submenu which correspond to actual selected
+     * item.
+     * @param menu menu where to search items.
+     * */
+    private void disableToDisplayMenu(final Menu menu) {
         MenuItem showAllItem = menu.findItem(R.id.showAllMenu);
         MenuItem showUnreadItem = menu.findItem(R.id.showUnreadMenu);
         MenuItem showStarredItem = menu.findItem(R.id.showStarredMenu);
@@ -235,6 +266,8 @@ public class ArticleListActivity extends ListActivity {
                     break;
                 case ALWAYS_PROMPT:
                     break;
+                default:
+                    break;
             }
         }
 
@@ -243,19 +276,20 @@ public class ArticleListActivity extends ListActivity {
     /**
      * disableMenuItem will disable the item with depending on his id and in
      * which menu is it.
-     * 
-     * @param menu
-     *            Menu where to disable some menu item.
-     * @param id
-     *            Id of the menuItem to disable.
+     * @param menu Menu where to disable some menu item.
+     * @param id Id of the menuItem to disable.
      * */
-    private void disableMenuItem(Menu menu, int id) {
+    private void disableMenuItem(final Menu menu, final int id) {
         MenuItem menuItem = menu.findItem(id);
         menuItem.setVisible(false);
         menuItem.setEnabled(false);
     }
 
-    private void enableMenuItem(MenuItem menuItem) {
+    /**
+     * set menu item visible.
+     * @param menuItem menu item to activate.
+     * */
+    private void enableMenuItem(final MenuItem menuItem) {
         menuItem.setVisible(true);
         menuItem.setEnabled(true);
     }
@@ -270,8 +304,9 @@ public class ArticleListActivity extends ListActivity {
         if (mArticleToDetail == null) {
             intent = getIntent();
         } else {
-            intent = new Intent(ArticleListActivity.this,
-                    ArticleDetailActivity.class);
+            intent =
+                    new Intent(ArticleListActivity.this,
+                            ArticleDetailActivity.class);
         }
 
         if (mArticleAdapter != null) {
@@ -295,8 +330,7 @@ public class ArticleListActivity extends ListActivity {
 
     /**
      * restoreAndUpdateData restores data saved in some Intent and update a
-     * modified article (which is also in Intent with special key).
-     * 
+     * modified article (which is also in Intent with special key).<br/>
      * This function is used when resume from ArticleDetailActivity because this
      * activity is able to update article states (read state and starred state).
      * */
@@ -317,12 +351,14 @@ public class ArticleListActivity extends ListActivity {
                     .getParcelableExtra("mArticleAdapterItem" + i));
         }
 
-        mArticleAdapter = new ArticleAdapter(getApplicationContext(),
-                R.layout.articlelist_item, R.id.articleItemTitle, articleList);
+        mArticleAdapter =
+                new ArticleAdapter(getApplicationContext(),
+                        R.layout.articlelist_item, R.id.articleItemTitle,
+                        articleList);
 
         // Update one article if needed
         Article articleUpdated = intent.getParcelableExtra(ARTICLE_KEY);
-
+        Integer articleUpdatedAdapterID = -1;
         if (articleUpdated != null) {
             for (int i = 0; i < mArticleAdapter.getCount(); i++) {
                 Article articleIterator = mArticleAdapter.getItem(i);
@@ -332,52 +368,79 @@ public class ArticleListActivity extends ListActivity {
                 if (articleIteratorId == articleUpdatedId) {
                     mArticleAdapter.remove(articleIterator);
                     mArticleAdapter.insert(articleUpdated, i);
+                    articleUpdatedAdapterID = i;
                 }
             }
         }
 
         // Apply restored data
         updateArticleAdapter();
+
+        // Set position of the cursor
+        if (articleUpdatedAdapterID > -1) {
+            setSelection(articleUpdatedAdapterID);
+        }
     }
 
     /**
      * ArticleAdapter is the specific ArrayAdapter for this ArticleListActivity.
      * */
     private class ArticleAdapter extends ArrayAdapter<Article> {
+        /**
+         * Application context where we'll create this adapter.
+         * */
         private Context mContext;
+        /**
+         * List of articles we'll display in the activity.
+         * */
         private List<Article> mArticles;
 
-        public ArticleAdapter(Context context, int itemLayout, int textViewId,
-                List<Article> articleList) {
+        /**
+         * Constructor.
+         * @param context @see ArrayAdapter
+         * @param itemLayout @see ArrayAdapter
+         * @param textViewId @see ArrayAdapter
+         * @param articleList list of articles to put in the activity.
+         * */
+        public ArticleAdapter(final Context context, final int itemLayout,
+                final int textViewId, final List<Article> articleList) {
             super(context, itemLayout, textViewId, articleList);
             mArticles = articleList;
             mContext = context;
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, final View convertView,
+                final ViewGroup parent) {
             Article article = mArticles.get(position);
+            View view = convertView;
 
             // Find the convertView
-            if (convertView == null) {
-                LayoutInflater layoutInflater = (LayoutInflater) this.mContext
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = layoutInflater.inflate(R.layout.articlelist_item,
-                        null);
+            if (view == null) {
+                LayoutInflater layoutInflater =
+                        (LayoutInflater) this.mContext
+                                .getSystemService(Context.
+                                        LAYOUT_INFLATER_SERVICE);
+                view =
+                        layoutInflater.inflate(R.layout.articlelist_item, null);
             }
 
             // Manage article
             RelativeLayout articleItem = null;
             if (article != null) {
-                articleItem = (RelativeLayout) convertView
-                        .findViewById(R.id.itemRelativeLayout);
+                articleItem =
+                        (RelativeLayout) view
+                                .findViewById(R.id.itemRelativeLayout);
                 if (articleItem != null) {
-                    TextView articleItemTitle = (TextView) articleItem
-                            .findViewById(R.id.articleItemTitle);
-                    TextView articleItemAuthor = (TextView) articleItem
-                            .findViewById(R.id.articleItemAuthor);
-                    TextView articleItemDate = (TextView) articleItem
-                            .findViewById(R.id.articleItemDate);
+                    TextView articleItemTitle =
+                            (TextView) articleItem
+                                    .findViewById(R.id.articleItemTitle);
+                    TextView articleItemAuthor =
+                            (TextView) articleItem
+                                    .findViewById(R.id.articleItemAuthor);
+                    TextView articleItemDate =
+                            (TextView) articleItem
+                                    .findViewById(R.id.articleItemDate);
 
                     if (articleItemTitle != null && articleItemAuthor != null
                             && articleItemDate != null) {

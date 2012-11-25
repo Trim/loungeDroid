@@ -5,31 +5,84 @@ import android.os.Parcelable;
 
 /**
  * Article is the type which implements all data received from the server for
- * one article.
- * 
+ * one article.<br/>
  * This implements Parcelable to be able to pass it in android Intents.
  * */
 public class Article implements Parcelable {
+    /**
+     * article id.
+     * */
     private Integer mId;
+    /**
+     * article publication day.
+     * */
     private Integer mDay;
+    /**
+     * article publication month.
+     * */
     private Integer mMonth;
+    /**
+     * article subject.
+     * */
     private String mSubject;
+    /**
+     * article content as html file.
+     * */
     private String mContent;
+    /**
+     * article author.
+     * */
     private String mAuthor;
+    /**
+     * article original link.
+     * */
     private String mLink;
+    /**
+     * icon of the article feed.
+     * */
     private String mIcon;
+    /**
+     * article read state.
+     * */
     private Boolean mIsRead = false;
+    /**
+     * article starred state.
+     * */
     private Boolean mIsStarred = false;
 
-    public Article(Integer id, Integer day, Integer month, String subject,
-            String content, String author, String link, String icon,
-            Boolean isRead, Boolean isStarred) {
+    /**
+     * Complete constructor of an article.
+     * @param id article id
+     * @param day article publication day
+     * @param month article publication month
+     * @param subject article subject
+     * @param content article content (html format)
+     * @param author article author
+     * @param link link of original article
+     * @param icon icon of news feed
+     * @param isRead read state
+     * @param isStarred starred state
+     * */
+    public Article(
+            final Integer id,
+            final Integer day,
+            final Integer month,
+            final String subject,
+            final String content,
+            final String author,
+            final String link,
+            final String icon,
+            final Boolean isRead,
+            final Boolean isStarred) {
         mId = id;
         mDay = day;
         mMonth = month;
         mSubject = subject;
-        mContent = "<?xml version='1.0' encoding='utf-8' ?>" + "<html><body>"
-                + content + " </body></html>";
+        mContent =
+                "<?xml version='1.0' encoding='utf-8' ?>"
+                        + "<html><body>"
+                        + content
+                        + " </body></html>";
         mAuthor = author;
         mLink = link;
         mIcon = icon;
@@ -37,23 +90,22 @@ public class Article implements Parcelable {
         mIsStarred = isStarred;
     }
 
-    public Boolean isRead() {
+    /**
+     * @return read state article
+     * */
+    public final Boolean isRead() {
         return mIsRead;
     }
 
-    public void setRead(Boolean isRead) {
-        this.mIsRead = isRead;
-    }
-
-    public Boolean isStarred() {
+    /**
+     * @return starred state article
+     * */
+    public final Boolean isStarred() {
         return mIsStarred;
     }
 
-    public void setStarred(Boolean isStarred) {
-        this.mIsStarred = isStarred;
-    }
-
-    public String toString() {
+    @Override
+    public final String toString() {
         String result = "Article[\n";
         result += "\tId : " + mId + ",\n";
         result += "\tMonth / Day : " + mMonth + " / " + mDay + ",\n";
@@ -67,35 +119,59 @@ public class Article implements Parcelable {
         return result;
     }
 
-    public Integer getId() {
+    /**
+     * @return article id
+     * */
+    public final Integer getId() {
         return mId;
     }
 
-    public void updateReadState() {
+    /**
+     * toggle read state.
+     * */
+    public final void updateReadState() {
         mIsRead = !mIsRead;
     }
 
-    public void updateStarredState() {
+    /**
+     * toggle starred state.
+     * */
+    public final void updateStarredState() {
         mIsStarred = !mIsStarred;
     }
 
-    public String getSubject() {
+    /**
+     * @return article subject
+     * */
+    public final String getSubject() {
         return mSubject;
     }
 
-    public String getAuthor() {
+    /**
+     * @return article author
+     * */
+    public final String getAuthor() {
         return mAuthor;
     }
 
-    public String getDate() {
+    /**
+     * @return article date (dd/mm)
+     * */
+    public final String getDate() {
         return mDay + "." + mMonth;
     }
 
-    public String getContent() {
+    /**
+     * @return article content
+     * */
+    public final String getContent() {
         return mContent;
     }
 
-    public String getLink() {
+    /**
+     * @return article original link
+     * */
+    public final String getLink() {
         return mLink;
     }
 
@@ -103,24 +179,28 @@ public class Article implements Parcelable {
      * Next field, methods and creator are needed to use Parcelabel. That's
      * needed to pass easier and faster Article from one activity to another.
      */
-    public static final Parcelable.Creator<Article> CREATOR = new Parcelable.Creator<Article>() {
-        public Article createFromParcel(Parcel in) {
-            return new Article(in);
-        }
+    /**
+     * Implementation of Parcelable for articles.
+     * */
+    public static final Parcelable.Creator<Article> CREATOR =
+            new Parcelable.Creator<Article>() {
+                public Article createFromParcel(final Parcel in) {
+                    return new Article(in);
+                }
 
-        public Article[] newArray(int size) {
-            return new Article[size];
-        }
-    };
+                public Article[] newArray(final int size) {
+                    return new Article[size];
+                }
+            };
 
     @Override
-    public int describeContents() {
+    public final int describeContents() {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public final void writeToParcel(final Parcel dest, final int flags) {
         dest.writeInt(mId);
         dest.writeInt(mDay);
         dest.writeInt(mMonth);
@@ -133,7 +213,11 @@ public class Article implements Parcelable {
         dest.writeValue(mIsStarred);
     }
 
-    private Article(Parcel parcel) {
+    /**
+     * Private constructor to retrieve article from parcel.
+     * @param parcel parcel which contains the article
+     * */
+    private Article(final Parcel parcel) {
         mId = parcel.readInt();
         mDay = parcel.readInt();
         mMonth = parcel.readInt();
