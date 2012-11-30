@@ -12,7 +12,7 @@ public class ParseArticleException extends Exception {
     private static final long serialVersionUID = -1916018652604709645L;
 
     @Override
-    public String getMessage() {
+    public final String getMessage() {
         return "Unable parse correctly messages.\n" + super.getMessage();
     }
 }

@@ -7,12 +7,12 @@ package ch.adorsaz.loungeDroid.exception;
 public class GetArticleListException extends Exception {
 
     /**
-     * Auto-generated ID by Eclpipse.
+     * Auto-generated ID by Eclipse.
      */
     private static final long serialVersionUID = 8449004512651295034L;
 
     @Override
-    public String getMessage() {
+    public final String getMessage() {
         return "Unable to get article list.\n" + super.getMessage();
     }
 }

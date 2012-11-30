@@ -7,12 +7,13 @@ package ch.adorsaz.loungeDroid.exception;
 public class StarredStateUpdateException extends Exception {
 
     /**
-     * Auto-generated ID by Eclpipse.
+     * Auto-generated ID by Eclipse.
      */
     private static final long serialVersionUID = -7137335428363481542L;
 
     @Override
-    public String getMessage() {
-        return "Unable to update the starred state of an article.\n"+super.getMessage();
+    public final String getMessage() {
+        return "Unable to update the starred state of an article.\n"
+                + super.getMessage();
     }
 }

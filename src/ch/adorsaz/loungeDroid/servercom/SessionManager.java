@@ -29,29 +29,94 @@ import android.widget.Toast;
  * SessionManager is the class which manage connection with server, check if
  * always logged and execute a request.
  * */
-public class SessionManager {
+public final class SessionManager {
+    /**
+     * User login for rssLounge server.
+     * */
     private static String mLogin = null;
+    /**
+     * User password for rssLounge server.
+     * */
     private static String mPassword = null;
+    /**
+     * Url of the rssLounge server.
+     * */
     private static String mServerUrl = null;
+    /**
+     * Session cookie received from server to keep session active.
+     * */
     private static String mSessionCookie = null;
+    /**
+     * The unique instance of this class.
+     * */
     private static SessionManager mSessionManager = null;
+    /**
+     * Application context, to get user prefrences.
+     * */
     private static Context mApplicationContext = null;
 
-    private final static String LOGIN_PAGE_RSSLOUNGE = "/index/login";
-    private final static String LOGIN_GET_RSSLOUNGE = "username";
-    private final static String PASSWORD_GET_RSSLOUNGE = "password";
-    protected final static String JSON_GET_RSSLOUNGE = "json=true";
+    /**
+     * Good response status as defined by HTTP.
+     * */
+    private static final int GOOD_RESPONSE_HTTP = 200;
+    /**
+     * login page of the rssLounge server.
+     * */
+    private static final String LOGIN_PAGE_RSSLOUNGE = "/index/login";
+    /**
+     * HttpGet parameter to give username.
+     * */
+    private static final String LOGIN_GET_RSSLOUNGE = "username";
+    /**
+     * HttpGet parameter to give password.
+     * */
+    private static final String PASSWORD_GET_RSSLOUNGE = "password";
+    /**
+     * HttpGet assignement to get json responses.
+     * */
+    protected static final String JSON_GET_RSSLOUNGE = "json=true";
 
+    /**
+     * Session cookie name.
+     * */
     protected static final String SESSION_COOKIE_NAME = "PHPSESSID";
-    protected static final String SESSION_COOKIE_SETTINGS = "session_cookie_settings";
+    /**
+     * Seession cookie key to save cookie in shared preferences.
+     * */
+    protected static final String SESSION_COOKIE_SETTINGS =
+            "session_cookie_settings";
 
-    protected final static String LOG_SERVER = "loungeDroid.server";
-    protected final static String BAD_LOGIN_ERROR = "Authentication failed : bad login and/or password.";
-    protected final static String MALFORMED_URL = "There's a typo in url. Please check url : ";
-    protected final static String NO_RESPONSE_SERVER_ERROR = "No server response. Check your settings.";
-    protected final static String UNEXPECTED_RESPONSE_ERROR = "There was a bug while connecting to server, please report it : ";
+    /**
+     * Server tag for logcat.
+     * */
+    protected static final String LOG_SERVER = "loungeDroid.server";
+    /**
+     * Error to show when incorrect username/password.
+     * */
+    protected static final String BAD_LOGIN_ERROR =
+            "Authentication failed : bad login and/or password.";
+    /**
+     * Error when malformed URL.
+     * */
+    protected static final String MALFORMED_URL =
+            "There's a typo in url. Please check url : ";
+    /**
+     * Error when you don't have any response from the server.
+     * */
+    protected static final String NO_RESPONSE_SERVER_ERROR =
+            "No server response. Check your settings.";
+    /**
+     * Error when a response wasn't expected as this.
+     * */
+    protected static final String UNEXPECTED_RESPONSE_ERROR =
+            "There was a bug while connecting to server, please report it : ";
 
-    public final static SessionManager getInstance(Context context) {
+    /**
+     * Instance getter.
+     * @return actual SessionManager instance.
+     * @param context context of the application to get preferences.
+     * */
+    public static SessionManager getInstance(final Context context) {
         if (mSessionManager == null) {
             mSessionManager = new SessionManager();
             mApplicationContext = context;
@@ -61,8 +126,17 @@ public class SessionManager {
         return mSessionManager;
     }
 
-    protected JSONObject serverRequest(String pageUrl, String httpParameters)
-        throws ConnectException {
+    /**
+     * Public method to do a server request.
+     * @param pageUrl page to fetch.
+     * @param httpParameters parameters to give to the server.
+     * @return JSON response from the server.
+     * @throws ConnectException if error occured during connection to the
+     *             server.
+     * */
+    protected JSONObject serverRequest(
+            final String pageUrl,
+            final String httpParameters) throws ConnectException {
         if (mSessionCookie == null || mSessionCookie.length() == 0) {
             loginLounge();
         }
@@ -70,27 +144,40 @@ public class SessionManager {
         return doRequest(pageUrl, httpParameters);
     }
 
-    static protected void deleteSessionCookie() {
+    /**
+     * Permits to delete session cookie.
+     * */
+    protected static void deleteSessionCookie() {
         mSessionCookie = null;
-        Editor editor = mApplicationContext.getSharedPreferences(
-                SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
-                .edit();
+        Editor editor =
+                mApplicationContext.getSharedPreferences(
+                        SettingsActivity.SHARED_PREFERENCES,
+                        Activity.MODE_PRIVATE).edit();
         editor.remove(SessionManager.SESSION_COOKIE_SETTINGS);
         editor.commit();
     }
 
+    /**
+     * fetch server and try to log in.
+     * @throws ConnectException if an error occurred during login.
+     * */
     private void loginLounge() throws ConnectException {
         try {
-            String urlParameters = LOGIN_GET_RSSLOUNGE + "="
-                    + URLEncoder.encode(mLogin, "UTF-8") + "&"
-                    + PASSWORD_GET_RSSLOUNGE + "="
-                    + URLEncoder.encode(mPassword, "UTF-8") + "&"
-                    + JSON_GET_RSSLOUNGE;
+            String urlParameters =
+                    LOGIN_GET_RSSLOUNGE
+                            + "="
+                            + URLEncoder.encode(mLogin, "UTF-8")
+                            + "&"
+                            + PASSWORD_GET_RSSLOUNGE
+                            + "="
+                            + URLEncoder.encode(mPassword, "UTF-8")
+                            + "&"
+                            + JSON_GET_RSSLOUNGE;
 
-            JSONObject jsonResponse = doRequest(LOGIN_PAGE_RSSLOUNGE,
-                    urlParameters);
+            JSONObject jsonResponse =
+                    doRequest(LOGIN_PAGE_RSSLOUNGE, urlParameters);
             if (jsonResponse != null) {
-                if (jsonResponse.getBoolean("success") == true) {
+                if (jsonResponse.getBoolean("success")) {
                     Log.d(LOG_SERVER, "Logged to the server.");
                     setCookiePref(mSessionCookie);
                 } else {
@@ -110,13 +197,21 @@ public class SessionManager {
         }
     }
 
+    /**
+     * Private constructor to do first instance.
+     * */
     private SessionManager() {
     }
 
+    /**
+     * Get user preferences.
+     * */
     private void getPreferences() {
         if (mApplicationContext != null) {
-            SharedPreferences pref = mApplicationContext.getSharedPreferences(
-                    SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE);
+            SharedPreferences pref =
+                    mApplicationContext.getSharedPreferences(
+                            SettingsActivity.SHARED_PREFERENCES,
+                            Activity.MODE_PRIVATE);
 
             mServerUrl = pref.getString(SettingsActivity.URL_SERVER_PREF, "");
 
@@ -126,8 +221,8 @@ public class SessionManager {
             }
 
             mLogin = pref.getString(SettingsActivity.USER_SERVER_PREF, "");
-            mPassword = pref.getString(SettingsActivity.PASSWORD_SERVER_PREF,
-                    "");
+            mPassword =
+                    pref.getString(SettingsActivity.PASSWORD_SERVER_PREF, "");
 
             if (pref.contains(SESSION_COOKIE_SETTINGS)) {
                 mSessionCookie = pref.getString(SESSION_COOKIE_SETTINGS, "");
@@ -135,9 +230,16 @@ public class SessionManager {
         }
     }
 
-    private String streamToString(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(
-                inputStream));
+    /**
+     * Read completely buffer and pass it to a String.
+     * @param inputStream stream to read.
+     * @throws IOException if error occurred reading the buffer.
+     * @return the String with buffer content.
+     * */
+    private String streamToString(final InputStream inputStream)
+        throws IOException {
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(inputStream));
 
         String result = br.readLine();
         String line = result;
@@ -150,15 +252,24 @@ public class SessionManager {
         return result;
     }
 
-    private synchronized JSONObject doRequest(String pageUrl,
-            String httpParameters) throws ConnectException {
+    /**
+     * Performs the request on the server.
+     * @param pageUrl @see serverRequest method
+     * @param httpParameters @see serverRequest method
+     * @return @see serverRequest method
+     * @throws ConnectException @see serverRequest method
+     * */
+    private synchronized JSONObject doRequest(
+            final String pageUrl,
+            final String httpParameters) throws ConnectException {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
 
         Log.d(LOG_SERVER, "Try to connect with cookie : " + mSessionCookie);
         try {
-            urlConnection = (HttpURLConnection) new URL(mServerUrl + pageUrl)
-                    .openConnection();
+            urlConnection =
+                    (HttpURLConnection) new URL(mServerUrl + pageUrl)
+                            .openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setChunkedStreamingMode(0);
 
@@ -166,20 +277,30 @@ public class SessionManager {
                 urlConnection.setRequestProperty("Cookie", mSessionCookie);
             }
 
-            DataOutputStream out = new DataOutputStream(
-                    urlConnection.getOutputStream());
+            DataOutputStream out =
+                    new DataOutputStream(urlConnection.getOutputStream());
             out.writeBytes(httpParameters);
             out.flush();
             out.close();
 
-            if (urlConnection.getResponseCode() == 200) {
+            Log.d(
+                    LOG_SERVER,
+                    "Received response with code "
+                            + urlConnection.getResponseCode()
+                            + " with message "
+                            + urlConnection.getResponseMessage());
+            if (urlConnection.getResponseCode() == GOOD_RESPONSE_HTTP) {
                 if (urlConnection.getHeaderField("Set-Cookie") != null) {
                     String cookie = urlConnection.getHeaderField("Set-Cookie");
                     if (cookie.startsWith(SESSION_COOKIE_NAME)) {
-                        mSessionCookie = SESSION_COOKIE_NAME
-                                + cookie.substring(cookie.indexOf('='),
-                                        cookie.indexOf(';') + 1);
-                        Log.d(LOG_SERVER, "Received cookie : " + mSessionCookie);
+                        mSessionCookie =
+                                SESSION_COOKIE_NAME
+                                        + cookie.substring(
+                                                cookie.indexOf('='),
+                                                cookie.indexOf(';') + 1);
+                        Log
+                                .d(LOG_SERVER, "Received cookie : "
+                                        + mSessionCookie);
                     }
                 }
 
@@ -191,13 +312,17 @@ public class SessionManager {
         } catch (MalformedURLException e) {
             errorDisplayAndSettings(MALFORMED_URL + pageUrl);
         } catch (IOException e) {
+
             throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
-                    + " input/output exception for page request : " + pageUrl);
+                    + " input/output ("
+                    + e.getLocalizedMessage()
+                    + ") exception for page request : "
+                    + pageUrl);
         } catch (JSONException e) {
-            throw new ConnectException(
-                    UNEXPECTED_RESPONSE_ERROR
-                            + " unable to read json response correctly for page request "
-                            + pageUrl);
+            throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
+                    + " unable to read json response"
+                    + " correctly for page request "
+                    + pageUrl);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -211,16 +336,26 @@ public class SessionManager {
         return jsonResponse;
     }
 
-    private void setCookiePref(String cookie) {
-        Editor editor = mApplicationContext.getSharedPreferences(
-                SettingsActivity.SHARED_PREFERENCES, Activity.MODE_PRIVATE)
-                .edit();
+    /**
+     * Cookie saver.
+     * @param cookie cookie to save.
+     * */
+    private void setCookiePref(final String cookie) {
+        Editor editor =
+                mApplicationContext.getSharedPreferences(
+                        SettingsActivity.SHARED_PREFERENCES,
+                        Activity.MODE_PRIVATE).edit();
         editor.putString(SESSION_COOKIE_SETTINGS, cookie);
         mSessionCookie = cookie;
         editor.commit();
     }
 
-    private void errorDisplayAndSettings(String message) {
+    /**
+     * Display a Toast with error message and call settings activity to check
+     * them.
+     * @param message error message.
+     * */
+    private void errorDisplayAndSettings(final String message) {
         Log.e(LOG_SERVER, message);
         Toast.makeText(mApplicationContext, message, Toast.LENGTH_LONG).show();
 

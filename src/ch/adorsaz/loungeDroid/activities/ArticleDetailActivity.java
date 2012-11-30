@@ -23,24 +23,52 @@ import android.content.Intent;
  * */
 public class ArticleDetailActivity extends Activity implements OnClickListener {
 
+    /**
+     * Currently shown article.
+     * */
     private Article mArticle = null;
+    /**
+     * Textview where to display article title.
+     */
     private TextView mTitle = null;
+    /**
+     * Textview where to display article author.
+     */
     private TextView mAuthor = null;
+    /**
+     * Textview where to display article date.
+     */
     private TextView mDate = null;
+    /**
+     * Webview where to display content.
+     */
     private WebView mContent = null;
+    /**
+     * Button to switch read state.
+     */
     private Button mReadButton = null;
+    /**
+     * Button to switch starred state.
+     */
     private Button mStarButton = null;
+    /**
+     * Button to display article in the browser.
+     */
     private Button mBrowserButton = null;
 
+    /**
+     * Boolean to know if pause is done from back button pressure or not.
+     * */
     private boolean isBackButtonPressed = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.articlelist_detail);
 
-        mArticle = this.getIntent().getParcelableExtra(
-                ArticleListActivity.ARTICLE_KEY);
+        mArticle =
+                this.getIntent().getParcelableExtra(
+                        ArticleListActivity.ARTICLE_KEY);
 
         Log.d("ArticleDetail", "Article received : " + mArticle.getId());
 
@@ -78,16 +106,16 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    public void onClick(View v) {
+    public final void onClick(final View v) {
         switch (v.getId()) {
             case R.id.newsRead:
-                ArticleReadStateUpdater readUpdate = new ArticleReadStateUpdater(
-                        this);
+                ArticleReadStateUpdater readUpdate =
+                        new ArticleReadStateUpdater(this);
                 readUpdate.execute(mArticle);
                 break;
             case R.id.newsStar:
-                ArticleStarredStateUpdater starUpdate = new ArticleStarredStateUpdater(
-                        this);
+                ArticleStarredStateUpdater starUpdate =
+                        new ArticleStarredStateUpdater(this);
                 starUpdate.execute(mArticle);
                 break;
             case R.id.newsBrowser:
@@ -95,18 +123,20 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
                 browserIntent.setData(Uri.parse(mArticle.getLink()));
                 startActivity(browserIntent);
                 break;
+            default:
+                break;
         }
     }
 
     @Override
-    public void onBackPressed() {
+    public final void onBackPressed() {
         // Here you get Back Key Press So make boolean false
         isBackButtonPressed = true;
         super.onBackPressed();
     }
 
     @Override
-    public void onPause() {
+    public final void onPause() {
         super.onPause();
         if (isBackButtonPressed) {
             goBackToArticleList();
@@ -114,12 +144,17 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    protected void onResume() {
+    protected final void onResume() {
         super.onResume();
         isBackButtonPressed = false;
     }
 
-    public void updateReadButton() {
+    /**
+     * updateReadButton() should be called from the asynk task which updates the
+     * read state of the displayed article.<br/>
+     * It should be called only when the async task has finished his job.
+     * */
+    public final void updateReadButton() {
         if (mArticle.isRead()) {
             mReadButton.setText(R.string.notRead);
             mReadButton.refreshDrawableState();
@@ -133,7 +168,12 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
         }
     }
 
-    public void updateStarredButton() {
+    /**
+     * updateStarredButton() should be called from the asynk task which updates
+     * the starred state of the displayed article.<br/>
+     * It should be called only when the async task has finished his job.
+     * */
+    public final void updateStarredButton() {
         if (mArticle.isStarred()) {
             mStarButton.setText(R.string.unStar);
             mReadButton.refreshDrawableState();
@@ -147,9 +187,14 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
         }
     }
 
+    /**
+     * This method save in the intent last states of the displayed articles and
+     * show article list activity.
+     * */
     private void goBackToArticleList() {
-        Intent intent = new Intent(ArticleDetailActivity.this,
-                ArticleListActivity.class);
+        Intent intent =
+                new Intent(ArticleDetailActivity.this,
+                        ArticleListActivity.class);
 
         intent.putExtras(getIntent());
         intent.putExtra(ArticleListActivity.ARTICLE_KEY, mArticle);

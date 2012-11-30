@@ -5,5 +5,8 @@ package ch.adorsaz.loungeDroid.article;
  * state.
  * */
 public enum ToDisplay {
+    /**
+     * Choice of user to display some articles.
+     * */
     ALWAYS_PROMPT, ALL, UNREAD, STARRED
 }

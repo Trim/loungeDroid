@@ -12,7 +12,7 @@ public class ReadStateUpdateException extends Exception {
     private static final long serialVersionUID = 859540452885060466L;
 
     @Override
-    public String getMessage() {
+    public final String getMessage() {
         return "Unable to update the read state of an article.\n"
                 + super.getMessage();
     }
