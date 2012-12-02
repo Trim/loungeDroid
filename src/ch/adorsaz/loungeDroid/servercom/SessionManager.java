@@ -265,50 +265,17 @@ public final class SessionManager {
         JSONObject jsonResponse = null;
         HttpURLConnection urlConnection = null;
 
-        Log.d(LOG_SERVER, "Try to connect with cookie : " + mSessionCookie);
+        Log.d(LOG_SERVER, "Try to connect to "
+                + pageUrl
+                + " with cookie : "
+                + mSessionCookie);
         try {
             urlConnection =
                     (HttpURLConnection) new URL(mServerUrl + pageUrl)
                             .openConnection();
-            urlConnection.setDoOutput(true);
-            urlConnection.setChunkedStreamingMode(0);
-
-            if (mSessionCookie != null && !(mSessionCookie.length() == 0)) {
-                urlConnection.setRequestProperty("Cookie", mSessionCookie);
-            }
-
-            DataOutputStream out =
-                    new DataOutputStream(urlConnection.getOutputStream());
-            out.writeBytes(httpParameters);
-            out.flush();
-            out.close();
-
-            Log.d(
-                    LOG_SERVER,
-                    "Received response with code "
-                            + urlConnection.getResponseCode()
-                            + " with message "
-                            + urlConnection.getResponseMessage());
-            if (urlConnection.getResponseCode() == GOOD_RESPONSE_HTTP) {
-                if (urlConnection.getHeaderField("Set-Cookie") != null) {
-                    String cookie = urlConnection.getHeaderField("Set-Cookie");
-                    if (cookie.startsWith(SESSION_COOKIE_NAME)) {
-                        mSessionCookie =
-                                SESSION_COOKIE_NAME
-                                        + cookie.substring(
-                                                cookie.indexOf('='),
-                                                cookie.indexOf(';') + 1);
-                        Log
-                                .d(LOG_SERVER, "Received cookie : "
-                                        + mSessionCookie);
-                    }
-                }
-
-                InputStream responseInput = urlConnection.getInputStream();
-                jsonResponse = new JSONObject(streamToString(responseInput));
-                responseInput.close();
-            }
-
+            Log.d(LOG_SERVER, "urlConnection successfully created");
+            initiateUrlConnection(urlConnection, httpParameters);
+            jsonResponse = treatHttpResponse(urlConnection);
         } catch (MalformedURLException e) {
             errorDisplayAndSettings(MALFORMED_URL + pageUrl);
         } catch (IOException e) {
@@ -332,6 +299,71 @@ public final class SessionManager {
         if (jsonResponse == null) {
             Log.e(LOG_SERVER, "jsonResponse is null ! Cannot access page "
                     + pageUrl);
+        }
+        return jsonResponse;
+    }
+
+    /**
+     * Initiate a connection to the page pageUrl with parameters httpParameters
+     * on the given urlConnection.
+     * @param urlConnection HttpURLConnection where to connect.
+     * @param httpParameters http parameters to give to the server.
+     * @throws IOException if there was an error while connecting to the server.
+     * */
+    private void initiateUrlConnection(
+            final HttpURLConnection urlConnection,
+            final String httpParameters) throws IOException {
+        urlConnection.setDoOutput(true);
+        urlConnection.setChunkedStreamingMode(0);
+
+        if (mSessionCookie != null && !(mSessionCookie.length() == 0)) {
+            urlConnection.setRequestProperty("Cookie", mSessionCookie);
+        }
+
+        DataOutputStream out =
+                new DataOutputStream(urlConnection.getOutputStream());
+        out.writeBytes(httpParameters);
+        out.flush();
+        out.close();
+        Log.d(LOG_SERVER, "urlConnection output stream successfully created");
+
+        Log.d(
+                LOG_SERVER,
+                "Received response with status code "
+                        + urlConnection.getResponseCode());
+        Log.d(
+                LOG_SERVER,
+                "Received response with message "
+                        + urlConnection.getResponseMessage());
+    }
+
+    /**
+     * treat HttpResponse from an urlConnection.
+     * @param urlConnection URL connection where to read the response.
+     * @return a JSON response
+     * @throws IOException if it was unable to read the response.
+     * @throws JSONException if it was unable to translate response in JSON.
+     * */
+    private JSONObject treatHttpResponse(final HttpURLConnection urlConnection)
+        throws IOException,
+        JSONException {
+        JSONObject jsonResponse = null;
+        if (urlConnection.getResponseCode() == GOOD_RESPONSE_HTTP) {
+            if (urlConnection.getHeaderField("Set-Cookie") != null) {
+                String cookie = urlConnection.getHeaderField("Set-Cookie");
+                if (cookie.startsWith(SESSION_COOKIE_NAME)) {
+                    mSessionCookie =
+                            SESSION_COOKIE_NAME
+                                    + cookie.substring(
+                                            cookie.indexOf('='),
+                                            cookie.indexOf(';') + 1);
+                    Log.d(LOG_SERVER, "Received cookie : " + mSessionCookie);
+                }
+            }
+
+            InputStream responseInput = urlConnection.getInputStream();
+            jsonResponse = new JSONObject(streamToString(responseInput));
+            responseInput.close();
         }
         return jsonResponse;
     }
