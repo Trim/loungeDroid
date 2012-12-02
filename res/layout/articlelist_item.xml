@@ -10,9 +10,9 @@
         android:id="@+id/articleItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:padding="2sp"
         android:textColor="@android:color/primary_text_light"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:visibility="visible" />
 
     <TextView
@@ -23,7 +23,7 @@
         android:layout_below="@+id/articleItemTitle"
         android:padding="2dp"
         android:textColor="@android:color/secondary_text_light"
-        android:textSize="16dp" />
+        android:textSize="16sp" />
 
     <TextView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -37,6 +37,6 @@
         android:gravity="bottom|center_vertical|right"
         android:padding="2dp"
         android:textColor="@android:color/secondary_text_light"
-        android:textSize="16dp" />
+        android:textSize="16sp" />
 
 </RelativeLayout>

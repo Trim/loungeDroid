@@ -5,7 +5,7 @@
         <EditTextPreference
             android:key="url_server_pref"
             android:singleLine="true"
-            android:summary="http(s)://www.example.org/rsslounge"
+            android:summary="@string/hint_server_url"
             android:title="@string/pref_server_url" />
         <EditTextPreference
             android:key="username_server_pref"
