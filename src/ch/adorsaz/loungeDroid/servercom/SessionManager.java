@@ -279,12 +279,30 @@ public final class SessionManager {
         } catch (MalformedURLException e) {
             errorDisplayAndSettings(MALFORMED_URL + pageUrl);
         } catch (IOException e) {
-
-            throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
-                    + " input/output ("
-                    + e.getLocalizedMessage()
-                    + ") exception for page request : "
-                    + pageUrl);
+            // TODO Find better hack.
+            Log.e(LOG_SERVER, "An error occured with server."
+                    + " Try to connect a second time.");
+            urlConnection.disconnect();
+            Log.d(LOG_SERVER, "Try to connect a second time to "
+                    + pageUrl
+                    + " with cookie : "
+                    + mSessionCookie);
+            try {
+                urlConnection =
+                        (HttpURLConnection) new URL(mServerUrl + pageUrl)
+                                .openConnection();
+                Log.d(LOG_SERVER, "urlConnection successfully created");
+                initiateUrlConnection(urlConnection, httpParameters);
+                jsonResponse = treatHttpResponse(urlConnection);
+            } catch (Exception e1) {
+                throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
+                        + " input/output ("
+                        + e1.getMessage()
+                        + ") exception for page request : "
+                        + pageUrl
+                        + " and with headerfield(0) : "
+                        + urlConnection.getHeaderField(0));
+            }
         } catch (JSONException e) {
             throw new ConnectException(UNEXPECTED_RESPONSE_ERROR
                     + " unable to read json response"
