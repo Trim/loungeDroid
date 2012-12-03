@@ -1,0 +1,5 @@
+== loungeDroid ==
+It's an android rss reader for rssLounge server.
+
+== Install ==
+To install this package, you can either download file at realease/loungeDroid-release.apk and put it on your phone (you have to accept package from SD card) or you can use Eclipse, import this project and install it on your device with the run button.
