@@ -3,10 +3,10 @@
     <string name="app_name">loungeDroid</string>
 
     <!-- List Activity -->
-    <string name="title_activity_article_list">loungeDroid : News viewer</string>
+    <string name="title_activity_article_list">News viewer</string>
 
     <!-- Detail Activity -->
-    <string name="title_activity_article_detail">loungeDroid : Article viewer</string>
+    <string name="title_activity_article_detail">Article viewer</string>
     <string name="browserButton">See in browser</string>
     <string name="starIt">Star it</string>
     <string name="unStar">Unstar</string>
