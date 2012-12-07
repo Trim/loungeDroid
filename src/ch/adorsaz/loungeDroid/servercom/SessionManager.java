@@ -409,8 +409,6 @@ public final class SessionManager {
         Log.e(LOG_SERVER, message);
         Toast.makeText(mApplicationContext, message, Toast.LENGTH_LONG).show();
 
-        SettingsActivity.setWantToEdit();
-
         Intent intent = new Intent(mApplicationContext, SettingsActivity.class);
         mApplicationContext.startActivity(intent);
     }
