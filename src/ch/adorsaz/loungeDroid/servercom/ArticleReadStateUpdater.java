@@ -110,8 +110,8 @@ public class ArticleReadStateUpdater
      * Method to updates article read state.
      * @return same article as in param, but with state updated.
      * @param article same article but with updated state if server made it.
-     * @throws ReadStateUpdateException if response of the server
-     *             contains "error" JSON
+     * @throws ReadStateUpdateException if response of the server contains
+     *             "error" JSON
      * @throws ConnectException if request on the server was bugged.
      * */
     private Article updateArticle(final Article article)

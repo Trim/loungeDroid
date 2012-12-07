@@ -82,8 +82,10 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
         mDate.setText(mArticle.getDate());
 
         mContent = (WebView) findViewById(R.id.newsContent);
-        mContent.loadData(Uri.encode(mArticle.getContent()),
-                "text/html; charset=UTF-8", "UTF-8");
+        mContent.loadData(
+                Uri.encode(mArticle.getContent()),
+                "text/html; charset=UTF-8",
+                "UTF-8");
 
         mReadButton = (Button) findViewById(R.id.newsRead);
         mReadButton.setOnClickListener(this);
@@ -158,12 +160,16 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
         if (mArticle.isRead()) {
             mReadButton.setText(R.string.notRead);
             mReadButton.refreshDrawableState();
-            Toast.makeText(getApplicationContext(), "Marked as read.",
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Marked as read.",
                     Toast.LENGTH_SHORT).show();
         } else {
             mReadButton.setText(R.string.markAsRead);
             mReadButton.refreshDrawableState();
-            Toast.makeText(getApplicationContext(), "Marked as unread.",
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Marked as unread.",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -177,12 +183,16 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
         if (mArticle.isStarred()) {
             mStarButton.setText(R.string.unStar);
             mReadButton.refreshDrawableState();
-            Toast.makeText(getApplicationContext(), "Starred.",
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Starred.",
                     Toast.LENGTH_SHORT).show();
         } else {
             mStarButton.setText(R.string.starIt);
             mReadButton.refreshDrawableState();
-            Toast.makeText(getApplicationContext(), "Unstarred.",
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Unstarred.",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -193,7 +203,8 @@ public class ArticleDetailActivity extends Activity implements OnClickListener {
      * */
     private void goBackToArticleList() {
         Intent intent =
-                new Intent(ArticleDetailActivity.this,
+                new Intent(
+                        ArticleDetailActivity.this,
                         ArticleListActivity.class);
 
         intent.putExtras(getIntent());

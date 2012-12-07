@@ -63,7 +63,8 @@ public class ArticleListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences pref =
-                getSharedPreferences(SettingsActivity.SHARED_PREFERENCES,
+                getSharedPreferences(
+                        SettingsActivity.SHARED_PREFERENCES,
                         Activity.MODE_PRIVATE);
 
         /* First, check if we need to ask settings to user. */
@@ -78,27 +79,29 @@ public class ArticleListActivity extends ListActivity {
                 (ToDisplay) getIntent().getSerializableExtra(DISPLAYCHOICE_KEY);
 
         if (mDisplayChoice == null) {
-            if (pref.getString(SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
             /* Now check if we should prompt user */
+            if (pref.getString(
+                    SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
                     "ALWAYS_PROMPT").equals("ALWAYS_PROMPT")) {
-                Log.d("ArticleList",
+                Log.d(
+                        "ArticleList",
                         "We display dialog box with mDisplayChoice : "
                                 + mDisplayChoice);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.displayMenu));
-                builder.setSingleChoiceItems(
-                        R.array.startdialog_human_toDisplay,
-                        R.array.startdialog_values_toDisplay,
-                        new DisplayDialogListener()).create().show();
+                builder
+                        .setSingleChoiceItems(
+                                R.array.startdialog_human_toDisplay,
+                                R.array.startdialog_values_toDisplay,
+                                new DisplayDialogListener())
+                        .create()
+                        .show();
             } else {
                 mDisplayChoice =
-                        ToDisplay
-                                .valueOf(pref
-                                        .getString(
-                                                SettingsActivity
-                                                .DISPLAY_BEHAVIOUR_PREF,
-                                                "ALL"));
+                        ToDisplay.valueOf(pref.getString(
+                                SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
+                                "ALL"));
 
                 fetchNews();
             }
@@ -111,15 +114,19 @@ public class ArticleListActivity extends ListActivity {
      * DisplayDialogListener is only used if user asked to prompt it which
      * articles he want to see.
      * */
-    private class DisplayDialogListener implements
+    private class DisplayDialogListener
+            implements
             DialogInterface.OnClickListener {
 
         @Override
         public void onClick(final DialogInterface dialog, final int which) {
             mDisplayChoice = ToDisplay.values()[which + 1]; // We won't show
                                                             // ALWAYS_PROMPT
-            Log.d("ArticleList", "have to show : " + mDisplayChoice
-                    + " (we selected " + which + ")");
+            Log.d("ArticleList", "have to show : "
+                    + mDisplayChoice
+                    + " (we selected "
+                    + which
+                    + ")");
             fetchNews();
             dialog.dismiss();
         }
@@ -193,8 +200,10 @@ public class ArticleListActivity extends ListActivity {
      * */
     public final void updateArticleList(final List<Article> articleList) {
         mArticleAdapter =
-                new ArticleAdapter(getApplicationContext(),
-                        R.layout.articlelist_item, R.id.articleItemTitle,
+                new ArticleAdapter(
+                        getApplicationContext(),
+                        R.layout.articlelist_item,
+                        R.id.articleItemTitle,
                         articleList);
         updateArticleAdapter();
     }
@@ -207,8 +216,11 @@ public class ArticleListActivity extends ListActivity {
         ListView listView = getListView();
         listView.setScrollingCacheEnabled(false);
         listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(final AdapterView<?> parent,
-                    final View view, final int position, final long id) {
+            public void onItemClick(
+                    final AdapterView<?> parent,
+                    final View view,
+                    final int position,
+                    final long id) {
                 mArticleToDetail = mArticleAdapter.getItem(position);
                 saveData();
             }
@@ -312,7 +324,8 @@ public class ArticleListActivity extends ListActivity {
             intent = getIntent();
         } else {
             intent =
-                    new Intent(ArticleListActivity.this,
+                    new Intent(
+                            ArticleListActivity.this,
                             ArticleDetailActivity.class);
         }
 
@@ -324,7 +337,8 @@ public class ArticleListActivity extends ListActivity {
             intent.putExtra(ARTICLE_KEY, mArticleToDetail);
 
             for (int i = 0; i < adapterSize; i++) {
-                intent.putExtra("mArticleAdapterItem" + i,
+                intent.putExtra(
+                        "mArticleAdapterItem" + i,
                         mArticleAdapter.getItem(i));
             }
             Log.d("ArticleList", "Saved displaychoice : " + mDisplayChoice);
@@ -348,9 +362,12 @@ public class ArticleListActivity extends ListActivity {
 
         int adapterSize = intent.getIntExtra("mArticleAdapterSize", 0);
 
-        Log.d("ArticleList",
+        Log.d(
+                "ArticleList",
                 "Ok, we are restoring data and we have to display : "
-                        + mDisplayChoice + " and we've saved " + adapterSize
+                        + mDisplayChoice
+                        + " and we've saved "
+                        + adapterSize
                         + " articles.");
 
         for (int i = 0; i < adapterSize; i++) {
@@ -359,8 +376,10 @@ public class ArticleListActivity extends ListActivity {
         }
 
         mArticleAdapter =
-                new ArticleAdapter(getApplicationContext(),
-                        R.layout.articlelist_item, R.id.articleItemTitle,
+                new ArticleAdapter(
+                        getApplicationContext(),
+                        R.layout.articlelist_item,
+                        R.id.articleItemTitle,
                         articleList);
 
         // Update one article if needed
@@ -409,15 +428,20 @@ public class ArticleListActivity extends ListActivity {
          * @param textViewId @see ArrayAdapter
          * @param articleList list of articles to put in the activity.
          * */
-        public ArticleAdapter(final Context context, final int itemLayout,
-                final int textViewId, final List<Article> articleList) {
+        public ArticleAdapter(
+                final Context context,
+                final int itemLayout,
+                final int textViewId,
+                final List<Article> articleList) {
             super(context, itemLayout, textViewId, articleList);
             mArticles = articleList;
             mContext = context;
         }
 
         @Override
-        public View getView(final int position, final View convertView,
+        public View getView(
+                final int position,
+                final View convertView,
                 final ViewGroup parent) {
             Article article = mArticles.get(position);
             View view = convertView;
@@ -426,10 +450,9 @@ public class ArticleListActivity extends ListActivity {
             if (view == null) {
                 LayoutInflater layoutInflater =
                         (LayoutInflater) this.mContext
-                                .getSystemService(Context.
-                                        LAYOUT_INFLATER_SERVICE);
-                view =
-                        layoutInflater.inflate(R.layout.articlelist_item, null);
+                                .getSystemService(
+                                        Context.LAYOUT_INFLATER_SERVICE);
+                view = layoutInflater.inflate(R.layout.articlelist_item, null);
             }
 
             // Manage article
@@ -449,7 +472,8 @@ public class ArticleListActivity extends ListActivity {
                             (TextView) articleItem
                                     .findViewById(R.id.articleItemDate);
 
-                    if (articleItemTitle != null && articleItemAuthor != null
+                    if (articleItemTitle != null
+                            && articleItemAuthor != null
                             && articleItemDate != null) {
                         if (!article.isRead()) {
                             articleItem.setBackgroundColor(getResources()

@@ -52,7 +52,8 @@ public class SettingsActivity extends PreferenceActivity {
 
         if (!pref.getString(URL_SERVER_PREF, "").equals("")) {
             Intent intent =
-                 new Intent(SettingsActivity.this, ArticleListActivity.class);
+                    new Intent(SettingsActivity.this,
+                            ArticleListActivity.class);
             startActivity(intent);
             finish();
         } else {
