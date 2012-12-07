@@ -66,11 +66,20 @@ public class ArticleListActivity extends ListActivity {
                 getSharedPreferences(SettingsActivity.SHARED_PREFERENCES,
                         Activity.MODE_PRIVATE);
 
+        /* First, check if we need to ask settings to user. */
+        if (pref.getString(SettingsActivity.URL_SERVER_PREF, "").equals("")) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        /* Then, get user preferences to know which articles to display. */
         mDisplayChoice =
                 (ToDisplay) getIntent().getSerializableExtra(DISPLAYCHOICE_KEY);
 
         if (mDisplayChoice == null) {
             if (pref.getString(SettingsActivity.DISPLAY_BEHAVIOUR_PREF,
+            /* Now check if we should prompt user */
                     "ALWAYS_PROMPT").equals("ALWAYS_PROMPT")) {
                 Log.d("ArticleList",
                         "We display dialog box with mDisplayChoice : "
@@ -166,8 +175,6 @@ public class ArticleListActivity extends ListActivity {
                 markAllRead();
                 break;
             case R.id.menu_settings:
-                SettingsActivity.setWantToEdit();
-
                 Intent intent;
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
