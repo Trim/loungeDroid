@@ -4,10 +4,8 @@ import ch.adorsaz.loungeDroid.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -39,46 +37,12 @@ public class SettingsActivity extends PreferenceActivity {
      * */
     public static final String PASSWORD_SERVER_PREF = "password_server_pref";
 
-    /**
-     * Key to store if user want edit preferences.
-     * */
-    public static final String WANT_TO_EDIT_PREF = "want_to_edit_pref";
-    /**
-     * Boolean to know if user want to edit preference (if so, show this
-     * activity, if not, pass to next activity).
-     * */
-    private static boolean mWantToEdit = true;
-
     @Override
     public final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getPreferenceManager().setSharedPreferencesName(SHARED_PREFERENCES);
         getPreferenceManager().setSharedPreferencesMode(Activity.MODE_PRIVATE);
-
-        SharedPreferences pref =
-                getSharedPreferences(SHARED_PREFERENCES, Activity.MODE_PRIVATE);
-
-        Log.d(
-                "Preferences",
-                "URL Server : " + pref.getString(URL_SERVER_PREF, ""));
-
-        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !mWantToEdit) {
-            Intent intent =
-                    new Intent(SettingsActivity.this,
-                               ArticleListActivity.class);
-            startActivity(intent);
-            finish();
-        } else {
-            Editor editor =
-                    getSharedPreferences(
-                            SettingsActivity.SHARED_PREFERENCES,
-                            Activity.MODE_PRIVATE).edit();
-            editor.remove(WANT_TO_EDIT_PREF);
-            editor.commit();
-            mWantToEdit = false;
-
-            addPreferencesFromResource(R.xml.preferences);
-        }
+        addPreferencesFromResource(R.xml.preferences);
     }
 
     @Override
@@ -86,10 +50,9 @@ public class SettingsActivity extends PreferenceActivity {
         SharedPreferences pref =
                 getSharedPreferences(SHARED_PREFERENCES, Activity.MODE_PRIVATE);
 
-        if (!pref.getString(URL_SERVER_PREF, "").equals("") && !mWantToEdit) {
+        if (!pref.getString(URL_SERVER_PREF, "").equals("")) {
             Intent intent =
-                    new Intent(SettingsActivity.this,
-                               ArticleListActivity.class);
+                 new Intent(SettingsActivity.this, ArticleListActivity.class);
             startActivity(intent);
             finish();
         } else {
@@ -99,12 +62,5 @@ public class SettingsActivity extends PreferenceActivity {
                             + " to use this application",
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    /**
-     * This method permit to alert this class that we want to edit preferences.
-     * */
-    public static void setWantToEdit() {
-        mWantToEdit = true;
     }
 }

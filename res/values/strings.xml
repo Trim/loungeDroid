@@ -23,6 +23,7 @@
     <string name="showStarred">Show only starred</string>
 
     <!-- Preferences -->
+    <string name="title_activity_article_settings">Settings</string>
     <string name="pref_server_category">Server configuration</string>
     <string name="pref_server_url">Server url</string>
     <string name="hint_server_url">http(s)://www.example.org/rsslounge</string>
