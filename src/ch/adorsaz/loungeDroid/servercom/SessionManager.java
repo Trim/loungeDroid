@@ -29,7 +29,11 @@ import android.widget.Toast;
  * SessionManager is the class which manage connection with server, check if
  * always logged and execute a request.
  * */
-public final class SessionManager {
+public enum SessionManager {
+    /**
+     * The unique instance of this class.
+     * */
+    mSessionManager;
     /**
      * User login for rssLounge server.
      * */
@@ -47,11 +51,7 @@ public final class SessionManager {
      * */
     private static String mSessionCookie = null;
     /**
-     * The unique instance of this class.
-     * */
-    private static SessionManager mSessionManager = null;
-    /**
-     * Application context, to get user prefrences.
+     * Application context, to get user preferences.
      * */
     private static Context mApplicationContext = null;
 
@@ -72,7 +72,7 @@ public final class SessionManager {
      * */
     private static final String PASSWORD_GET_RSSLOUNGE = "password";
     /**
-     * HttpGet assignement to get json responses.
+     * HttpGet assignment to get json responses.
      * */
     protected static final String JSON_GET_RSSLOUNGE = "json=true";
 
@@ -81,7 +81,7 @@ public final class SessionManager {
      * */
     protected static final String SESSION_COOKIE_NAME = "PHPSESSID";
     /**
-     * Seession cookie key to save cookie in shared preferences.
+     * Session cookie key to save cookie in shared preferences.
      * */
     protected static final String SESSION_COOKIE_SETTINGS =
             "session_cookie_settings";
@@ -117,12 +117,7 @@ public final class SessionManager {
      * @param context context of the application to get preferences.
      * */
     public static SessionManager getInstance(final Context context) {
-        if (mSessionManager == null) {
-            mSessionManager = new SessionManager();
-            mApplicationContext = context;
-            mSessionManager.getPreferences();
-        }
-
+        mApplicationContext = context;
         return mSessionManager;
     }
 
